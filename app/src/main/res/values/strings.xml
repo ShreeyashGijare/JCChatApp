@@ -3,7 +3,7 @@
 
 
     <string name="sign_up">Sign Up</string>
-    <string name="login">login</string>
+    <string name="login">Login</string>
     <string name="create_account">Don\'t have an account!! Click here to Sign Up</string>
 
 </resources>
