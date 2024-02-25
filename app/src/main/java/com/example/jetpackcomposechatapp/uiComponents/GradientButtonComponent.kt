@@ -29,13 +29,14 @@ import com.example.jetpackcomposechatapp.ui.theme.shapes
 @Composable
 fun GradientButtonComponent(
     modifier: Modifier = Modifier,
-    @StringRes buttonText: Int
+    @StringRes buttonText: Int,
+    onClick: () -> Unit
 ) {
 
     val focus = LocalFocusManager.current
 
     Button(
-        onClick = { /*TODO*/ },
+        onClick = { onClick() },
         modifier = modifier
             .fillMaxWidth()
             .heightIn(48.dp),

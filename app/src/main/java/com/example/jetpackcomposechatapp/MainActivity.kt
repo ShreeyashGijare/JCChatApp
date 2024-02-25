@@ -15,10 +15,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.jetpackcomposechatapp.screens.LoginScreen
 import com.example.jetpackcomposechatapp.screens.SignUpScreen
 import com.example.jetpackcomposechatapp.ui.theme.JetPackComposeChatAppTheme
-import com.example.jetpackcomposechatapp.utils.Constants
 import com.example.jetpackcomposechatapp.utils.Screen
-import com.example.jetpackcomposechatapp.viewModel.ChatViewModel
-import dagger.hilt.EntryPoint
+import com.example.jetpackcomposechatapp.viewModel.SignUpViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -42,7 +40,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
-    val viewModel: ChatViewModel = hiltViewModel()
+    val viewModel: SignUpViewModel = hiltViewModel()
 
     NavHost(navController = navController, startDestination = Screen.SignUpScreen.route) {
 
