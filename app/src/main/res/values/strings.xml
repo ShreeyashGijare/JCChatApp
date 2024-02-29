@@ -6,4 +6,9 @@
     <string name="login">Login</string>
     <string name="create_account">Don\'t have an account!! Click here to Sign Up</string>
 
+    <string name="user_name_error">Please enter a valid Username!!!</string>
+    <string name="email_error">Please enter a valid Email!!!</string>
+    <string name="number_error">Please enter a valid Number!!!</string>
+    <string name="password_error">Please enter a valid Password!!!</string>
+
 </resources>

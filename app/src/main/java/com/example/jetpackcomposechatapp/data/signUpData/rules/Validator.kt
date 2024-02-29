@@ -1,11 +1,10 @@
 package com.example.jetpackcomposechatapp.data.signUpData.rules
 
 import android.util.Patterns
-import java.util.regex.Pattern
 
 object Validator {
 
-    fun firstNameValidation(fName: String): ValidationResult {
+    fun userNameValidation(fName: String): ValidationResult {
         return ValidationResult(
             (fName.isNotEmpty() && fName.length >= 3)
         )

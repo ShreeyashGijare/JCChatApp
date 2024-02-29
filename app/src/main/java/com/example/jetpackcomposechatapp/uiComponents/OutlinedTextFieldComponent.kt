@@ -1,7 +1,9 @@
 package com.example.jetpackcomposechatapp.uiComponents
 
-import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -13,7 +15,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,16 +23,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedTextFieldComponent(
     labelValue: String,
     leadingIcon: ImageVector,
-    onTextSelected: (String) -> Unit
+    onTextSelected: (String) -> Unit,
+    @StringRes errorMessage: Int,
+    isError: Boolean = false
 ) {
 
     var textValue: String by remember {
@@ -55,19 +61,35 @@ fun OutlinedTextFieldComponent(
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedLabelColor = MaterialTheme.colorScheme.primary
         ),
-        /*keyboardOptions = KeyboardOptions.Default,*/
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Next
+        ),
         singleLine = true,
         leadingIcon = {
             Icon(imageVector = leadingIcon, contentDescription = null)
-        }
+        },
+        isError = isError
     )
+    if (isError) {
+        Text(
+            text = stringResource(id = errorMessage),
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .offset(y = (-8).dp)
+                .fillMaxWidth(0.9f)
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordTextFieldComponent(
     labelValue: String,
-    onTextSelected: (String) -> Unit
+    onTextSelected: (String) -> Unit,
+    isError: Boolean = false,
+    @StringRes errorMessage: Int
 ) {
 
     var textValue: String by remember {
@@ -95,7 +117,10 @@ fun PasswordTextFieldComponent(
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedLabelColor = MaterialTheme.colorScheme.primary
         ),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Next
+        ),
         singleLine = true,
         leadingIcon = {
             Icon(
@@ -111,7 +136,18 @@ fun PasswordTextFieldComponent(
                 )
             }
         },
-        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        isError = isError
     )
-
+    if (!isError) {
+        Text(
+            text = stringResource(id = errorMessage),
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .offset(y = (-8).dp)
+                .fillMaxWidth(0.9f)
+        )
+    }
 }

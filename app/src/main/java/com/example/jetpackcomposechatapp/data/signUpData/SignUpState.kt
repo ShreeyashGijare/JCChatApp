@@ -5,8 +5,8 @@ data class SignUpState(
     val number: String = "",
     val email: String = "",
     val password: String = "",
-    val nameError: String = "",
-    val numberError: String = "",
-    val emailError: String = "",
-    val passwordError: String = "",
+    val nameError: Boolean = false,
+    val numberError: Boolean = false,
+    val emailError: Boolean = false,
+    val passwordError: Boolean = false
 )
