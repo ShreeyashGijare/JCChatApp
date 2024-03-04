@@ -6,13 +6,15 @@ object Validator {
 
     fun userNameValidation(fName: String): ValidationResult {
         return ValidationResult(
-            (fName.isNotEmpty() && fName.length >= 3)
+            (fName.isNotEmpty() && fName.length >= 3),
+            errorMessage = "Please enter a valid name"
         )
     }
 
     fun numberValidation(number: String): ValidationResult {
         return ValidationResult(
-            (number.length == 10)
+            status = (number.length == 10),
+            errorMessage = "Please enter a valid phone number"
         )
     }
 

@@ -1,7 +1,9 @@
 package com.example.jetpackcomposechatapp.uiComponents
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -36,7 +38,7 @@ fun OutlinedTextFieldComponent(
     labelValue: String,
     leadingIcon: ImageVector,
     onTextSelected: (String) -> Unit,
-    @StringRes errorMessage: Int,
+    errorMessage: String = "",
     isError: Boolean = false
 ) {
 
@@ -59,20 +61,24 @@ fun OutlinedTextFieldComponent(
             focusedLabelColor = MaterialTheme.colorScheme.primary,
             cursorColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.primary
+            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+            errorLeadingIconColor = MaterialTheme.colorScheme.error,
+            errorBorderColor = MaterialTheme.colorScheme.error,
+            errorLabelColor = MaterialTheme.colorScheme.error
         ),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next
         ),
         singleLine = true,
         leadingIcon = {
-            Icon(imageVector = leadingIcon, contentDescription = null)
+            Icon(imageVector = leadingIcon, contentDescription = null, )
         },
         isError = isError
     )
+    Spacer(modifier = Modifier.height(10.dp))
     if (isError) {
         Text(
-            text = stringResource(id = errorMessage),
+            text = errorMessage,
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier
@@ -89,7 +95,7 @@ fun PasswordTextFieldComponent(
     labelValue: String,
     onTextSelected: (String) -> Unit,
     isError: Boolean = false,
-    @StringRes errorMessage: Int
+    errorMessage: String = ""
 ) {
 
     var textValue: String by remember {
@@ -115,11 +121,13 @@ fun PasswordTextFieldComponent(
             focusedLabelColor = MaterialTheme.colorScheme.primary,
             cursorColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.primary
+            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+            errorLeadingIconColor = MaterialTheme.colorScheme.error,
+            errorBorderColor = MaterialTheme.colorScheme.error,
+            errorLabelColor = MaterialTheme.colorScheme.error
         ),
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Default
         ),
         singleLine = true,
         leadingIcon = {
@@ -139,9 +147,10 @@ fun PasswordTextFieldComponent(
         visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
         isError = isError
     )
-    if (!isError) {
+    Spacer(modifier = Modifier.height(10.dp))
+    if (isError) {
         Text(
-            text = stringResource(id = errorMessage),
+            text = errorMessage,
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier

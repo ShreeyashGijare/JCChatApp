@@ -1,6 +1,5 @@
 package com.example.jetpackcomposechatapp.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,19 +15,15 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.jetpackcomposechatapp.R
-import com.example.jetpackcomposechatapp.data.signUpData.UIEvents
+import com.example.jetpackcomposechatapp.data.signUpData.SignUpEvents
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.CommonProgressBar
@@ -71,56 +66,56 @@ fun SignUpScreen(
             labelValue = "Enter your Name",
             leadingIcon = Icons.Default.AccountCircle,
             onTextSelected = {
-                viewModel.onEvent(UIEvents.FirstName(it))
+                viewModel.onEvent(SignUpEvents.Name(it))
             },
             isError = signUpState.nameError,
-            errorMessage = R.string.user_name_error
+            errorMessage = signUpState.nameErrorMessage
         )
         Spacer(modifier = Modifier.heightIn(10.dp))
         OutlinedTextFieldComponent(
             labelValue = "Enter your Number",
             leadingIcon = Icons.Default.PhoneAndroid,
             onTextSelected = {
-                viewModel.onEvent(UIEvents.Number(it))
+                viewModel.onEvent(SignUpEvents.Number(it))
             },
             isError = signUpState.numberError,
-            errorMessage = R.string.number_error
+            errorMessage = signUpState.numberErrorMessage
         )
         Spacer(modifier = Modifier.heightIn(10.dp))
         OutlinedTextFieldComponent(
             labelValue = "Enter your Email",
             leadingIcon = Icons.Default.Email,
             onTextSelected = {
-                viewModel.onEvent(UIEvents.Email(it))
+                viewModel.onEvent(SignUpEvents.Email(it))
             },
             isError = signUpState.emailError,
-            errorMessage = R.string.email_error
+            errorMessage = signUpState.emailErrorMessage
         )
         Spacer(modifier = Modifier.heightIn(10.dp))
-        PasswordTextFieldComponent(labelValue = "Enter your Password", onTextSelected = {
-            viewModel.onEvent(UIEvents.Password(it))
-        },
+        PasswordTextFieldComponent(
+            labelValue = "Enter your Password", onTextSelected = {
+                viewModel.onEvent(SignUpEvents.Password(it))
+            },
             isError = signUpState.passwordError,
-            errorMessage = R.string.password_error
+            errorMessage = signUpState.passwordErrorMessage
         )
         Spacer(modifier = Modifier.heightIn(30.dp))
         GradientButtonComponent(
             buttonText = R.string.sign_up,
             modifier = Modifier.padding(horizontal = 40.dp)
         ) {
-
-            viewModel.onEvent(UIEvents.SignUpButtonClick)
-
+            viewModel.onEvent(SignUpEvents.SignUpButtonClick)
         }
         Spacer(modifier = Modifier.heightIn(10.dp))
-        BodySmallComponent(textValue = R.string.create_account) {
+        BodySmallComponent(textValue = R.string.already_have_account) {
             navigateUpTo(navController, Screen.LoginScreen.route)
         }
 
     }
-
     if (viewModel.inProgress.value) {
         CommonProgressBar()
     }
-
+    if (viewModel.signInSuccess.value) {
+        navigateUpTo(navController, Screen.ChatListScreen.route)
+    }
 }

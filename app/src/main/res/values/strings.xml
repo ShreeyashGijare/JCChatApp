@@ -3,7 +3,8 @@
 
 
     <string name="sign_up">Sign Up</string>
-    <string name="login">Login</string>
+    <string name="sign_in">Sign In</string>
+    <string name="already_have_account">Already have an account!! Click her to Login</string>
     <string name="create_account">Don\'t have an account!! Click here to Sign Up</string>
 
     <string name="user_name_error">Please enter a valid Username!!!</string>

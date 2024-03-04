@@ -4,16 +4,21 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.jetpackcomposechatapp.data.signUpData.SignUpState
-import com.example.jetpackcomposechatapp.data.signUpData.UIEvents
+import com.example.jetpackcomposechatapp.data.signUpData.SignUpEvents
 import com.example.jetpackcomposechatapp.data.signUpData.rules.Validator
 import com.example.jetpackcomposechatapp.data.userData.UserData
+import com.example.jetpackcomposechatapp.utils.Constants.NUMBER_SUB_NODE
 import com.example.jetpackcomposechatapp.utils.Constants.USER_NODE
 import com.example.jetpackcomposechatapp.utils.Events
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -27,88 +32,122 @@ class SignUpViewModel @Inject constructor(
     private val _signUpState = mutableStateOf(SignUpState())
     var signUpState: State<SignUpState> = _signUpState
 
-    /*//PLValidation
-    private val validationEventChannel = Channel<ValidationEvent>()
-    val validationEvents = validationEventChannel.receiveAsFlow()*/
-
     var inProgress = mutableStateOf(false)
     private val eventMutableState = mutableStateOf<Events<String>?>(null)
 
-    private var signIn = mutableStateOf(false)
-    private var user = mutableStateOf<UserData?>(null)
+    private val _SignInSuccess = mutableStateOf(false)
+    var signInSuccess: State<Boolean> = _SignInSuccess
+    var currentUser = mutableStateOf<UserData?>(null)
 
-    fun onEvent(event: UIEvents) {
+    init {
+        val currentUser = auth.currentUser
+        _SignInSuccess.value = currentUser != null
+        currentUser?.uid?.let {
+            getUserData(it)
+        }
+    }
+
+    fun onEvent(event: SignUpEvents) {
         when (event) {
-            is UIEvents.FirstName -> {
+            is SignUpEvents.Name -> {
                 _signUpState.value = signUpState.value.copy(
-                    name = event.firstName
+                    name = event.name
                 )
+                validateName()
             }
 
-            is UIEvents.Email -> {
+            is SignUpEvents.Email -> {
                 _signUpState.value = signUpState.value.copy(
                     email = event.email
                 )
+                validateEmail()
             }
 
-            is UIEvents.Number -> {
+            is SignUpEvents.Number -> {
                 _signUpState.value = signUpState.value.copy(
                     number = event.number
                 )
+                validateNumber()
             }
 
-            is UIEvents.Password -> {
+            is SignUpEvents.Password -> {
                 _signUpState.value = signUpState.value.copy(
                     password = event.password
                 )
+                validatePassword()
             }
 
-            UIEvents.SignUpButtonClick -> {
-                validateDataWithRules()
+            SignUpEvents.SignUpButtonClick -> {
+                if (validateName() && validateNumber() && validateEmail() && validatePassword()) {
+                    signUp(
+                        _signUpState.value.name,
+                        _signUpState.value.number,
+                        _signUpState.value.email,
+                        _signUpState.value.password
+                    )
+                } else {
+                    validateName()
+                    validateNumber()
+                    validateEmail()
+                    validatePassword()
+                }
             }
         }
     }
 
-    private fun validateDataWithRules() {
+    private fun validateName(): Boolean {
         val nameResult = Validator.userNameValidation(fName = _signUpState.value.name)
-        val numberResult = Validator.numberValidation(number = _signUpState.value.number)
-        val emailResult = Validator.emailValidation(email = _signUpState.value.email)
-        val passwordResult = Validator.passwordValidation(password = _signUpState.value.password)
-
-        val hasError = listOf(
-            nameResult,
-            numberResult,
-            emailResult,
-            passwordResult
-        ).any { !it.status }
-
-        if (hasError) {
-            _signUpState.value = signUpState.value.copy(
-                nameError = !nameResult.status,
-                numberError = !numberResult.status,
-                emailError = !emailResult.status,
-                passwordError = !passwordResult.status
-            )
-            return
-        }
-        signUp(
-            _signUpState.value.name,
-            _signUpState.value.number,
-            _signUpState.value.email,
-            _signUpState.value.password
+        _signUpState.value = signUpState.value.copy(
+            nameError = !nameResult.status,
+            nameErrorMessage = nameResult.errorMessage
         )
+        return nameResult.status
+    }
+
+    private fun validateNumber(): Boolean {
+        val numberResult = Validator.numberValidation(number = _signUpState.value.number)
+        _signUpState.value = signUpState.value.copy(
+            numberError = !numberResult.status,
+            numberErrorMessage = numberResult.errorMessage
+        )
+        return numberResult.status
+    }
+
+    private fun validateEmail(): Boolean {
+        val emailResult = Validator.emailValidation(email = _signUpState.value.email)
+        _signUpState.value = signUpState.value.copy(
+            emailError = !emailResult.status,
+            emailErrorMessage = emailResult.errorMessage
+        )
+        return emailResult.status
+    }
+
+    private fun validatePassword(): Boolean {
+        val passwordResult = Validator.passwordValidation(password = _signUpState.value.password)
+        _signUpState.value = signUpState.value.copy(
+            passwordError = !passwordResult.status,
+            passwordErrorMessage = passwordResult.errorMessage
+        )
+        return passwordResult.status
     }
 
     private fun signUp(name: String, number: String, email: String, password: String) {
         inProgress.value = true
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.i("SIGNUP", "SIGNUP")
-                signIn.value = true
-                createOrUpdateProfile(name, number)
+        db.collection(NUMBER_SUB_NODE).whereEqualTo("number", number).get().addOnSuccessListener {
+            if (it.isEmpty) {
+                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("SIGNUP", "SIGNUP")
+                        _SignInSuccess.value = true
+                        createOrUpdateProfile(name, number)
+                    } else {
+                        Log.i("SIGNUP", "Error")
+                        handleException(task.exception, customMessage = "Sign Up Failed")
+                    }
+                }
             } else {
-                Log.i("SIGNUP", "Error")
-                handleException(task.exception, customMessage = "Sign Up Failed")
+                inProgress.value = false
+                handleException(customMessage = "The user already exists")
             }
         }
     }
@@ -118,27 +157,27 @@ class SignUpViewModel @Inject constructor(
         number: String? = null,
         imageUrl: String? = null
     ) {
-        val uid = auth.currentUser?.uid
-        val userData = UserData(
-            userId = uid,
-            name = name ?: user.value?.name,
-            number = number ?: user.value?.number,
-            imageUrl = imageUrl ?: user.value?.imageUrl
-        )
-
-        uid.let {
-            inProgress.value = true
-
-            db.collection(USER_NODE).document(uid!!).get().addOnSuccessListener {
-                if (it.exists()) {
-                    //update the user
-                } else {
-                    db.collection(USER_NODE).document().set(userData)
-                    inProgress.value = false
-                    getUserData(uid)
+        viewModelScope.launch {
+            val uid = auth.currentUser?.uid
+            val userData = UserData(
+                userId = uid,
+                name = name ?: currentUser.value?.name,
+                number = number ?: currentUser.value?.number,
+                imageUrl = imageUrl ?: currentUser.value?.imageUrl
+            )
+            uid.let {
+                inProgress.value = true
+                db.collection(USER_NODE).document(uid!!).get().addOnSuccessListener {
+                    if (it.exists()) {
+                        //update the user
+                    } else {
+                        db.collection(USER_NODE).document().set(userData)
+                        inProgress.value = false
+                        getUserData(uid)
+                    }
+                }.addOnFailureListener {
+                    handleException(it, "Cannot Retrieve User")
                 }
-            }.addOnFailureListener {
-                handleException(it, "Cannot Retrieve User")
             }
         }
     }
@@ -146,14 +185,12 @@ class SignUpViewModel @Inject constructor(
     private fun getUserData(uid: String) {
         inProgress.value = true
         db.collection(USER_NODE).document(uid).addSnapshotListener { value, error ->
-
             if (error != null) {
                 handleException(error, "Cannot Retrieve User")
             }
-
             if (value != null) {
                 val user = value.toObject<UserData>()
-                this.user.value = user
+                this.currentUser.value = user
                 inProgress.value = false
             }
         }
