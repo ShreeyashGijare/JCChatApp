@@ -83,13 +83,12 @@ fun Navigation() {
 
             Screen.StatusListScreen.route -> {
                 selectedItemIndex = 0
-                navController.popBackStack()
-
+                navigateUpTo(navController, Screen.ChatListScreen.route)
             }
 
             Screen.ProfileScreen.route -> {
                 selectedItemIndex = 0
-                navController.popBackStack()
+                navigateUpTo(navController, Screen.ChatListScreen.route)
             }
         }
     }
