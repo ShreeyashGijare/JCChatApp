@@ -81,7 +81,6 @@ class LoginViewModel @Inject constructor(
             if (error != null) {
             }
             if (value != null) {
-
                 val user = value.toObject<UserData>()
                 this.currentUser.value = user
                 _LoginSuccess.value = true

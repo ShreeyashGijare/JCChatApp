@@ -94,4 +94,7 @@ fun LoginScreen(
     if (viewModel.inProgress.value) {
         CommonProgressBar()
     }
+    if (viewModel.logInSuccess.value) {
+        navigateUpTo(navController, Screen.ChatListScreen.route)
+    }
 }
