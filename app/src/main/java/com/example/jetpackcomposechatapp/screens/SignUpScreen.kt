@@ -31,6 +31,7 @@ import com.example.jetpackcomposechatapp.uiComponents.GradientButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.OutlinedTextFieldComponent
 import com.example.jetpackcomposechatapp.uiComponents.PasswordTextFieldComponent
+import com.example.jetpackcomposechatapp.utils.Graph
 import com.example.jetpackcomposechatapp.utils.Screen
 import com.example.jetpackcomposechatapp.viewModel.SignUpViewModel
 
@@ -116,6 +117,6 @@ fun SignUpScreen(
         CommonProgressBar()
     }
     if (viewModel.signInSuccess.value) {
-        navigateUpTo(navController, Screen.ChatListScreen.route)
+        navigateUpTo(navController, Graph.HOME)
     }
 }

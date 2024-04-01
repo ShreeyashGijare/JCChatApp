@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
+import com.example.jetpackcomposechatapp.utils.Graph
 import com.example.jetpackcomposechatapp.utils.Screen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -46,7 +47,7 @@ fun ChatListScreen(
         BodySmallComponent(textValue = R.string.sign_out) {
             coroutineScope.launch {
                 if (signOutUser()) {
-                    navigateUpTo(navController, Screen.LoginScreen.route)
+                    navigateUpTo(navController, Graph.AUTHENTICATION)
                 } else {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
