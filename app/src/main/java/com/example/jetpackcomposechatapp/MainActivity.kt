@@ -54,6 +54,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    companion object {
+        const val AUTH_NAV_GRAPH = "Auth"
+        const val MAIN_NAV_GRAPH = "Main"
+    }
 }
 
 @Composable
@@ -130,9 +135,11 @@ fun Navigation() {
             StatusListScreen(navController)
         }
         composable(Screen.ProfileScreen.route) {
-            ProfileScreen(navController)
+            ProfileScreen(/*navController*/)
         }
     }
+
+
 }
 
 @Composable
@@ -180,4 +187,5 @@ fun BottomNavigation(
         content(Modifier.padding(it))
     }
 }
+
 

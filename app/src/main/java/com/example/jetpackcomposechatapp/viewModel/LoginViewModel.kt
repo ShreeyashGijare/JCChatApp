@@ -59,7 +59,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-
     private fun login(email: String, password: String) {
         inProgress.value = true
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
