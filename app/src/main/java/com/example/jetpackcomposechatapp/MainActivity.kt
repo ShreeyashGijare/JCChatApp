@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.jetpackcomposechatapp.navigation.graphs.RootNavGraph
 import com.example.jetpackcomposechatapp.navigation.graphs.authNavGraph
 import com.example.jetpackcomposechatapp.screens.HomeScreen
 import com.example.jetpackcomposechatapp.ui.theme.JetPackComposeChatAppTheme
@@ -29,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Navigation()
+                    RootNavGraph(navHostController = rememberNavController())
                 }
             }
         }

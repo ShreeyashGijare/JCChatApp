@@ -1,4 +1,4 @@
-package com.example.jetpackcomposechatapp.data.loginData.rules
+package com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.rules
 
 import android.util.Patterns
 

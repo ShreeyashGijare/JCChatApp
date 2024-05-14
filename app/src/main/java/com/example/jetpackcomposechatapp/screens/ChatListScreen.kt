@@ -47,6 +47,7 @@ fun ChatListScreen(
         BodySmallComponent(textValue = R.string.sign_out) {
             coroutineScope.launch {
                 if (signOutUser()) {
+                    navController.popBackStack()
                     navigateUpTo(navController, Graph.AUTHENTICATION)
                 } else {
                     withContext(Dispatchers.Main) {

@@ -1,11 +1,11 @@
-package com.example.jetpackcomposechatapp.viewModel
+package com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.jetpackcomposechatapp.data.loginData.LoginEvents
-import com.example.jetpackcomposechatapp.data.loginData.LoginState
-import com.example.jetpackcomposechatapp.data.loginData.rules.Validator
+import com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.LoginEvents
+import com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.LoginState
+import com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.rules.Validator
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.utils.Constants
 import com.google.firebase.auth.FirebaseAuth

@@ -13,4 +13,6 @@
     <string name="number_error">Please enter a valid Number!!!</string>
     <string name="password_error">Please enter a valid Password!!!</string>
 
+    <string name="add_chat">Add Chat</string>
+
 </resources>

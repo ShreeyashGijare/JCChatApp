@@ -1,13 +1,13 @@
-package com.example.jetpackcomposechatapp.viewModel
+package com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.jetpackcomposechatapp.data.signUpData.SignUpState
-import com.example.jetpackcomposechatapp.data.signUpData.SignUpEvents
-import com.example.jetpackcomposechatapp.data.signUpData.rules.Validator
+import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpState
+import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpEvents
+import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.rules.Validator
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.utils.Constants.NUMBER_SUB_NODE
 import com.example.jetpackcomposechatapp.utils.Constants.USER_NODE
@@ -16,9 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.lang.Exception
 import javax.inject.Inject
 

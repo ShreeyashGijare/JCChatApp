@@ -1,4 +1,4 @@
-package com.example.jetpackcomposechatapp.data.signUpData
+package com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData
 
 data class SignUpState(
     val name: String = "",
