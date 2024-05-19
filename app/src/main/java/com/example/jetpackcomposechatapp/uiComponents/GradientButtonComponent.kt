@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.ui.theme.shapes
 
-@Preview
 @Composable
 fun GradientButtonComponent(
     modifier: Modifier = Modifier,
@@ -52,7 +51,7 @@ fun GradientButtonComponent(
                     brush = Brush.horizontalGradient(
                         listOf(
                             MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.secondary
+                            MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     ),
                     shape = RoundedCornerShape(50.dp)

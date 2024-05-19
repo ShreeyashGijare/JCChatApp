@@ -62,7 +62,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3-android:1.2.1")
     implementation("com.google.firebase:firebase-auth:22.3.1")
     implementation("com.google.firebase:firebase-firestore:24.10.2")
     testImplementation("junit:junit:4.13.2")
@@ -82,6 +82,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.1")
     implementation("androidx.compose.material:material-icons-extended:1.4.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
 
     //SplashScreen
     implementation("androidx.core:core-splashscreen:1.0.1")

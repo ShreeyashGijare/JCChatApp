@@ -23,21 +23,21 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.jetpackcomposechatapp.R
-import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpEvents
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
+import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpEvents
+import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.SignUpViewModel
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.CommonProgressBar
 import com.example.jetpackcomposechatapp.uiComponents.GradientButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.OutlinedTextFieldComponent
 import com.example.jetpackcomposechatapp.uiComponents.PasswordTextFieldComponent
+import com.example.jetpackcomposechatapp.utils.AuthRouteScreen
 import com.example.jetpackcomposechatapp.utils.Graph
-import com.example.jetpackcomposechatapp.utils.Screen
-import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.SignUpViewModel
 
 @Composable
 fun SignUpScreen(
-    navController: NavController,
+    rootNavController: NavController,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
 
@@ -109,8 +109,8 @@ fun SignUpScreen(
         }
         Spacer(modifier = Modifier.heightIn(10.dp))
         BodySmallComponent(textValue = R.string.already_have_account) {
-            navController.popBackStack()
-            navigateUpTo(navController, Screen.LoginScreen.route)
+            rootNavController.popBackStack()
+            navigateUpTo(rootNavController, AuthRouteScreen.LoginScreen.route)
         }
 
     }
@@ -118,6 +118,6 @@ fun SignUpScreen(
         CommonProgressBar()
     }
     if (viewModel.signInSuccess.value) {
-        navigateUpTo(navController, Graph.HOME)
+        navigateUpTo(rootNavController, Graph.MAIN_SCREEN_GRAPH)
     }
 }

@@ -21,21 +21,21 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.jetpackcomposechatapp.R
-import com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.LoginEvents
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
+import com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.LoginEvents
+import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.LoginViewModel
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.CommonProgressBar
 import com.example.jetpackcomposechatapp.uiComponents.GradientButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.OutlinedTextFieldComponent
 import com.example.jetpackcomposechatapp.uiComponents.PasswordTextFieldComponent
+import com.example.jetpackcomposechatapp.utils.AuthRouteScreen
 import com.example.jetpackcomposechatapp.utils.Graph
-import com.example.jetpackcomposechatapp.utils.Screen
-import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
+    rootNavController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
 
@@ -88,8 +88,8 @@ fun LoginScreen(
         }
         Spacer(modifier = Modifier.heightIn(10.dp))
         BodySmallComponent(textValue = R.string.create_account) {
-            navController.popBackStack()
-            navigateUpTo(navController, Screen.SignUpScreen.route)
+            rootNavController.popBackStack()
+            navigateUpTo(rootNavController, AuthRouteScreen.SignUpScreen.route)
         }
 
     }
@@ -97,6 +97,10 @@ fun LoginScreen(
         CommonProgressBar()
     }
     if (viewModel.logInSuccess.value) {
-        navigateUpTo(navController, Graph.HOME)
+        rootNavController.navigate(Graph.MAIN_SCREEN_GRAPH) {
+            popUpTo(AuthRouteScreen.LoginScreen.route) {
+                inclusive = true
+            }
+        }
     }
 }

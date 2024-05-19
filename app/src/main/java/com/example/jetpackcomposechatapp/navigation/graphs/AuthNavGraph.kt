@@ -6,19 +6,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.jetpackcomposechatapp.ui.loginSignUp.screens.LoginScreen
 import com.example.jetpackcomposechatapp.ui.loginSignUp.screens.SignUpScreen
+import com.example.jetpackcomposechatapp.utils.AuthRouteScreen
 import com.example.jetpackcomposechatapp.utils.Graph
-import com.example.jetpackcomposechatapp.utils.Screen
 
-fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.authNavGraph(rootNavController: NavHostController) {
     navigation(
-        route = Graph.AUTHENTICATION,
-        startDestination = Screen.SignUpScreen.route
+        route = Graph.AUTHENTICATION_GRAPH,
+        startDestination = AuthRouteScreen.SignUpScreen.route
     ) {
-        composable(Screen.SignUpScreen.route) {
-            SignUpScreen(navController = navController)
+        composable(AuthRouteScreen.SignUpScreen.route) {
+            SignUpScreen(rootNavController = rootNavController)
         }
-        composable(Screen.LoginScreen.route) {
-            LoginScreen(navController = navController)
+        composable(AuthRouteScreen.LoginScreen.route) {
+            LoginScreen(rootNavController = rootNavController)
         }
     }
 }
