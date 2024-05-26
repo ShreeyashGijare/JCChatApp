@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -80,7 +81,8 @@ fun SignUpScreen(
                 viewModel.onEvent(SignUpEvents.Number(it))
             },
             isError = signUpState.numberError,
-            errorMessage = signUpState.numberErrorMessage
+            errorMessage = signUpState.numberErrorMessage,
+            keyboardType = KeyboardType.Number
         )
         Spacer(modifier = Modifier.heightIn(10.dp))
         OutlinedTextFieldComponent(
@@ -90,7 +92,8 @@ fun SignUpScreen(
                 viewModel.onEvent(SignUpEvents.Email(it))
             },
             isError = signUpState.emailError,
-            errorMessage = signUpState.emailErrorMessage
+            errorMessage = signUpState.emailErrorMessage,
+            keyboardType = KeyboardType.Email
         )
         Spacer(modifier = Modifier.heightIn(10.dp))
         PasswordTextFieldComponent(

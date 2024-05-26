@@ -12,6 +12,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,11 +25,11 @@ class LoginViewModel @Inject constructor(
     private val _loginState = mutableStateOf(LoginState())
     var loginState: State<LoginState> = _loginState
 
-    private val _LoginSuccess = mutableStateOf(false)
-    var logInSuccess: State<Boolean> = _LoginSuccess
+    private val _LoginSuccess = MutableStateFlow(false)
+    var logInSuccess: StateFlow<Boolean> = _LoginSuccess
 
     var inProgress = mutableStateOf(false)
-    var currentUser = mutableStateOf<UserData?>(null)
+    private var currentUser = mutableStateOf<UserData?>(null)
 
     fun onEvent(event: LoginEvents) {
         when (event) {
@@ -64,8 +66,8 @@ class LoginViewModel @Inject constructor(
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful) {
                 inProgress.value = false
-                auth.currentUser?.uid?.let {
-                    getUserData(it)
+                auth.currentUser?.uid?.let { userId ->
+                    getUserData(userId)
                 }
             } else {
 
@@ -82,8 +84,8 @@ class LoginViewModel @Inject constructor(
             if (value != null) {
                 val user = value.toObject<UserData>()
                 this.currentUser.value = user
-                _LoginSuccess.value = true
                 inProgress.value = false
+                _LoginSuccess.value = true
             }
         }
     }

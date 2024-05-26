@@ -82,18 +82,15 @@ fun LetterByLetterAnimatedText() {
         mutableStateOf("")
     }
     LaunchedEffect(text) {
-        // Initial start delay of the typing animation
         delay(1000)
         breakIterator.text = StringCharacterIterator(text)
 
         var nextIndex = breakIterator.next()
-        // Iterate over the string, by index boundary
         while (nextIndex != BreakIterator.DONE) {
             substringText = text.subSequence(0, nextIndex).toString()
-            // Go to the next logical character boundary
             nextIndex = breakIterator.next()
             delay(typingDelayInMs)
         }
     }
-    Text(substringText)
+    Text("${Firebase.auth.currentUser} ${Firebase.auth.currentUser?.displayName}")
 }

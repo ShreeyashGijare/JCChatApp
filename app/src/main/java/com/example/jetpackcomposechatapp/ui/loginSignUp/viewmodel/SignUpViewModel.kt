@@ -13,6 +13,7 @@ import com.example.jetpackcomposechatapp.utils.Constants.NUMBER_SUB_NODE
 import com.example.jetpackcomposechatapp.utils.Constants.USER_NODE
 import com.example.jetpackcomposechatapp.utils.Events
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -156,6 +157,7 @@ class SignUpViewModel @Inject constructor(
         imageUrl: String? = null
     ) {
         viewModelScope.launch {
+            val user = auth.currentUser
             val uid = auth.currentUser?.uid
             val userData = UserData(
                 userId = uid,
@@ -163,18 +165,30 @@ class SignUpViewModel @Inject constructor(
                 number = number ?: currentUser.value?.number,
                 imageUrl = imageUrl ?: currentUser.value?.imageUrl
             )
-            uid.let {
-                inProgress.value = true
-                db.collection(USER_NODE).document(uid!!).get().addOnSuccessListener {
-                    if (it.exists()) {
-                        //update the user
+            val profileUpdates = UserProfileChangeRequest.Builder()
+                .setDisplayName(userData.name)
+                .build()
+            user?.let {
+                it.updateProfile(profileUpdates).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        uid.let {
+                            db.collection(USER_NODE).document(uid!!).get()
+                                .addOnSuccessListener { snapShot ->
+                                    if (snapShot.exists()) {
+                                        //update the user
+                                    } else {
+                                        db.collection(USER_NODE).document().set(userData)
+                                        inProgress.value = false
+                                        getUserData(uid)
+                                    }
+                                }.addOnFailureListener { exception ->
+                                    handleException(exception, "Cannot Retrieve User")
+                                }
+                        }
+
                     } else {
-                        db.collection(USER_NODE).document().set(userData)
-                        inProgress.value = false
-                        getUserData(uid)
+                        Log.i("ProfileUpdateException", task.exception?.message.toString())
                     }
-                }.addOnFailureListener {
-                    handleException(it, "Cannot Retrieve User")
                 }
             }
         }

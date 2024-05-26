@@ -13,10 +13,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -38,8 +41,20 @@ fun LoginScreen(
     rootNavController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-
     val loginState by viewModel.loginState
+    val loginSuccess by viewModel.logInSuccess.collectAsState()
+
+    LaunchedEffect(key1 = loginSuccess) {
+        if (loginSuccess) {
+            rootNavController.navigate(Graph.MAIN_SCREEN_GRAPH) {
+                popUpTo(Graph.AUTHENTICATION_GRAPH  ) {
+                    inclusive = true
+                }
+            }
+        } else {
+
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -69,7 +84,8 @@ fun LoginScreen(
                 viewModel.onEvent(LoginEvents.Email(it))
             },
             isError = loginState.emailError,
-            errorMessage = loginState.emailErrorMessage
+            errorMessage = loginState.emailErrorMessage,
+            keyboardType = KeyboardType.Email
         )
         Spacer(modifier = Modifier.heightIn(10.dp))
         PasswordTextFieldComponent(
@@ -96,11 +112,5 @@ fun LoginScreen(
     if (viewModel.inProgress.value) {
         CommonProgressBar()
     }
-    if (viewModel.logInSuccess.value) {
-        rootNavController.navigate(Graph.MAIN_SCREEN_GRAPH) {
-            popUpTo(AuthRouteScreen.LoginScreen.route) {
-                inclusive = true
-            }
-        }
-    }
+
 }

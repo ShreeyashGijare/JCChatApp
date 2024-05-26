@@ -8,9 +8,9 @@ data class UserData(
 ) {
 
     fun toMap() = mapOf(
-        "userId" to userId,
+        "imageUrl" to imageUrl,
         "name" to name,
         "number" to number,
-        "imageUrl" to imageUrl
+        "userId" to userId
     )
 }

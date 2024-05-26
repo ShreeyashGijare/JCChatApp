@@ -39,7 +39,8 @@ fun OutlinedTextFieldComponent(
     leadingIcon: ImageVector,
     onTextSelected: (String) -> Unit,
     errorMessage: String = "",
-    isError: Boolean = false
+    isError: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
 
     var textValue: String by remember {
@@ -59,19 +60,23 @@ fun OutlinedTextFieldComponent(
         colors = outlinedTextFieldColors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             focusedLabelColor = MaterialTheme.colorScheme.primary,
+            focusedTextColor = MaterialTheme.colorScheme.primary,
             cursorColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
+            unfocusedTextColor = MaterialTheme.colorScheme.secondary,
             errorLeadingIconColor = MaterialTheme.colorScheme.error,
             errorBorderColor = MaterialTheme.colorScheme.error,
-            errorLabelColor = MaterialTheme.colorScheme.error
+            errorLabelColor = MaterialTheme.colorScheme.error,
+            errorTextColor = MaterialTheme.colorScheme.error
         ),
         keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Next,
+            keyboardType = keyboardType
         ),
         singleLine = true,
         leadingIcon = {
-            Icon(imageVector = leadingIcon, contentDescription = null, )
+            Icon(imageVector = leadingIcon, contentDescription = null)
         },
         isError = isError
     )
@@ -119,15 +124,19 @@ fun PasswordTextFieldComponent(
         colors = outlinedTextFieldColors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             focusedLabelColor = MaterialTheme.colorScheme.primary,
+            focusedTextColor = MaterialTheme.colorScheme.primary,
             cursorColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
+            unfocusedTextColor = MaterialTheme.colorScheme.secondary,
             errorLeadingIconColor = MaterialTheme.colorScheme.error,
             errorBorderColor = MaterialTheme.colorScheme.error,
-            errorLabelColor = MaterialTheme.colorScheme.error
+            errorLabelColor = MaterialTheme.colorScheme.error,
+            errorTextColor = MaterialTheme.colorScheme.error
         ),
         keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Default
+            imeAction = ImeAction.Default,
+            keyboardType = KeyboardType.Password
         ),
         singleLine = true,
         leadingIcon = {
