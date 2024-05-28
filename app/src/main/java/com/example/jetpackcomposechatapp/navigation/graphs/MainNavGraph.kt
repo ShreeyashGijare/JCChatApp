@@ -7,9 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.jetpackcomposechatapp.screens.ChatListScreen
-import com.example.jetpackcomposechatapp.screens.ProfileScreen
-import com.example.jetpackcomposechatapp.screens.StatusListScreen
+import com.example.jetpackcomposechatapp.ui.mainContent.screens.ChatListScreen
+import com.example.jetpackcomposechatapp.ui.mainContent.screens.ContactsScreen
+import com.example.jetpackcomposechatapp.ui.mainContent.screens.ProfileScreen
+import com.example.jetpackcomposechatapp.ui.mainContent.screens.StatusListScreen
 import com.example.jetpackcomposechatapp.utils.Graph
 import com.example.jetpackcomposechatapp.utils.MainRouteScreen
 
@@ -33,6 +34,9 @@ fun MainNavGraph(
         }
         composable(MainRouteScreen.ProfileScreen.route) {
             ProfileScreen(navController = rootNavController)
+        }
+        composable(MainRouteScreen.ContactsScreen.route) {
+            ContactsScreen(navController = rootNavController)
         }
     }
 }

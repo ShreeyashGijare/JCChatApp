@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,19 @@ fun SignUpScreen(
 ) {
 
     val signUpState by viewModel.signUpState
+    val signUpSuccess by viewModel.signInSuccess.collectAsState()
+
+    LaunchedEffect(key1 = signUpSuccess) {
+        if (signUpSuccess) {
+            rootNavController.navigate(Graph.MAIN_SCREEN_GRAPH) {
+                popUpTo(Graph.AUTHENTICATION_GRAPH) {
+                    inclusive = true
+                }
+            }
+        } else {
+
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -119,8 +134,5 @@ fun SignUpScreen(
     }
     if (viewModel.inProgress.value) {
         CommonProgressBar()
-    }
-    if (viewModel.signInSuccess.value) {
-        navigateUpTo(rootNavController, Graph.MAIN_SCREEN_GRAPH)
     }
 }

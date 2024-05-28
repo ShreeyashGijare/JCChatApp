@@ -1,4 +1,4 @@
-package com.example.jetpackcomposechatapp.screens
+package com.example.jetpackcomposechatapp.ui.mainContent.screens
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController

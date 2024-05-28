@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.MarkChatRead
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.outlined.MarkChatRead
 import androidx.compose.material.icons.outlined.Update
-import com.example.jetpackcomposechatapp.data.bottomNavigationItem.BottomNavigationItem
+import com.example.jetpackcomposechatapp.ui.mainContent.data.bottomNavigationItem.BottomNavigationItem
 
 val bottomNavigationItemList = listOf(
     BottomNavigationItem(

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.jetpackcomposechatapp.screens.MainScreen
+import com.example.jetpackcomposechatapp.ui.mainContent.screens.MainScreen
 import com.example.jetpackcomposechatapp.utils.Graph
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase

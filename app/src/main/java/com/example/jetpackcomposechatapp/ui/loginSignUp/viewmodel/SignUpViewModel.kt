@@ -17,6 +17,8 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.Exception
 import javax.inject.Inject
@@ -34,8 +36,10 @@ class SignUpViewModel @Inject constructor(
     var inProgress = mutableStateOf(false)
     private val eventMutableState = mutableStateOf<Events<String>?>(null)
 
-    private val _SignInSuccess = mutableStateOf(false)
-    var signInSuccess: State<Boolean> = _SignInSuccess
+
+    private val _SignInSuccess = MutableStateFlow(false)
+    var signInSuccess: StateFlow<Boolean> = _SignInSuccess
+
     var currentUser = mutableStateOf<UserData?>(null)
 
     init {
@@ -137,7 +141,6 @@ class SignUpViewModel @Inject constructor(
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.i("SIGNUP", "SIGNUP")
-                        _SignInSuccess.value = true
                         createOrUpdateProfile(name, number)
                     } else {
                         Log.i("SIGNUP", "Error")
@@ -204,6 +207,7 @@ class SignUpViewModel @Inject constructor(
                 val user = value.toObject<UserData>()
                 this.currentUser.value = user
                 inProgress.value = false
+                _SignInSuccess.value = true
             }
         }
     }

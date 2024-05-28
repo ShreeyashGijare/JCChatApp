@@ -10,7 +10,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.example.jetpackcomposechatapp.data.bottomNavigationItem.BottomNavigationItem
+import com.example.jetpackcomposechatapp.ui.mainContent.data.bottomNavigationItem.BottomNavigationItem
 
 /**
  * @author Coding Meet
@@ -24,10 +24,8 @@ fun BottomNavigationBar(
     currentRoute: String?,
     onClick: (BottomNavigationItem) -> Unit,
 ) {
-    NavigationBar(
-
-    ) {
-        items.forEachIndexed { index, navigationItem ->
+    NavigationBar {
+        items.forEachIndexed { _, navigationItem ->
             NavigationBarItem(
                 colors = NavigationBarItemDefaults.colors(
                 ),

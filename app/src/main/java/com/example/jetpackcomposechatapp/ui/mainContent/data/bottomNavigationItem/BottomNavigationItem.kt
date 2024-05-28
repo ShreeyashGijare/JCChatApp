@@ -1,4 +1,4 @@
-package com.example.jetpackcomposechatapp.data.bottomNavigationItem
+package com.example.jetpackcomposechatapp.ui.mainContent.data.bottomNavigationItem
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

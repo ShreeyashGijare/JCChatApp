@@ -12,11 +12,11 @@ sealed class AuthRouteScreen(val route: String) {
 
 }
 
-    sealed class MainRouteScreen(val route: String) {
+sealed class MainRouteScreen(val route: String) {
 
     object ProfileScreen : MainRouteScreen("Profile")
     object ChatListScreen : MainRouteScreen("ChatList")
-
     object StatusListScreen : MainRouteScreen("Status")
+    object ContactsScreen: MainRouteScreen("Contacts")
 
 }
