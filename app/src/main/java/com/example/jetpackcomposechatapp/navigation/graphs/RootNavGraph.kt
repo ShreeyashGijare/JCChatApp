@@ -18,7 +18,7 @@ fun RootNavGraph() {
         route = Graph.ROOT_GRAPH,
         startDestination = firebaseAuthCheck()
     ) {
-        composable(route = Graph.MAIN_SCREEN_GRAPH) {
+        composable(route = Graph.HOME_GRAPH) {
             MainScreen(rootNavController)
         }
         authNavGraph(rootNavController)
@@ -30,6 +30,6 @@ fun firebaseAuthCheck(): String {
     return if (Firebase.auth.currentUser == null) {
         Graph.AUTHENTICATION_GRAPH
     } else {
-        Graph.MAIN_SCREEN_GRAPH
+        Graph.HOME_GRAPH
     }
 }

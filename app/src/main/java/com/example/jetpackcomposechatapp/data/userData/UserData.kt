@@ -1,11 +1,11 @@
 package com.example.jetpackcomposechatapp.data.userData
 
 data class UserData(
-    val userId: String? = "",
+    val imageUrl: String? = "",
     val name: String? = "",
     val number: String? = "",
-    val imageUrl: String? = ""
-) {
+    val userId: String? = ""
+    ) {
 
     fun toMap() = mapOf(
         "imageUrl" to imageUrl,

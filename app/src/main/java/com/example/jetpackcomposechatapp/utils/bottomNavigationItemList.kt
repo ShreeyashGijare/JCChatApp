@@ -10,21 +10,21 @@ import com.example.jetpackcomposechatapp.ui.mainContent.data.bottomNavigationIte
 val bottomNavigationItemList = listOf(
     BottomNavigationItem(
         "Chat",
-        MainRouteScreen.ChatListScreen.route,
+        HomeRouteScreen.ChatListScreen.route,
         selectedIcon = Icons.Filled.MarkChatRead,
         unSelectedIcon = Icons.Outlined.MarkChatRead,
         false
     ),
     BottomNavigationItem(
         "Updates",
-        MainRouteScreen.StatusListScreen.route,
+        HomeRouteScreen.StatusListScreen.route,
         selectedIcon = Icons.Filled.Update,
         unSelectedIcon = Icons.Outlined.Update,
         false
     ),
     BottomNavigationItem(
         "Profile",
-        MainRouteScreen.ProfileScreen.route,
+        HomeRouteScreen.ProfileScreen.route,
         selectedIcon = Icons.Filled.MarkChatRead,
         unSelectedIcon = Icons.Outlined.MarkChatRead,
         false

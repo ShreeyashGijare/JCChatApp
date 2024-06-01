@@ -49,7 +49,7 @@ fun SignUpScreen(
 
     LaunchedEffect(key1 = signUpSuccess) {
         if (signUpSuccess) {
-            rootNavController.navigate(Graph.MAIN_SCREEN_GRAPH) {
+            rootNavController.navigate(Graph.HOME_GRAPH) {
                 popUpTo(Graph.AUTHENTICATION_GRAPH) {
                     inclusive = true
                 }

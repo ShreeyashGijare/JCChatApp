@@ -12,30 +12,30 @@ import com.example.jetpackcomposechatapp.ui.mainContent.screens.ContactsScreen
 import com.example.jetpackcomposechatapp.ui.mainContent.screens.ProfileScreen
 import com.example.jetpackcomposechatapp.ui.mainContent.screens.StatusListScreen
 import com.example.jetpackcomposechatapp.utils.Graph
-import com.example.jetpackcomposechatapp.utils.MainRouteScreen
+import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
 
 @Composable
-fun MainNavGraph(
+fun HomeNavGraph(
     rootNavController: NavHostController,
     homeNavController: NavHostController,
     paddingValues: PaddingValues
 ) {
     NavHost(
         navController = homeNavController,
-        route = Graph.MAIN_SCREEN_GRAPH,
-        startDestination = MainRouteScreen.ChatListScreen.route,
+        route = Graph.HOME_GRAPH,
+        startDestination = HomeRouteScreen.ChatListScreen.route,
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(MainRouteScreen.ChatListScreen.route) {
+        composable(HomeRouteScreen.ChatListScreen.route) {
             ChatListScreen(navController = rootNavController)
         }
-        composable(MainRouteScreen.StatusListScreen.route) {
+        composable(HomeRouteScreen.StatusListScreen.route) {
             StatusListScreen(navController = rootNavController)
         }
-        composable(MainRouteScreen.ProfileScreen.route) {
+        composable(HomeRouteScreen.ProfileScreen.route) {
             ProfileScreen(navController = rootNavController)
         }
-        composable(MainRouteScreen.ContactsScreen.route) {
+        composable(HomeRouteScreen.ContactsScreen.route) {
             ContactsScreen(navController = rootNavController)
         }
     }

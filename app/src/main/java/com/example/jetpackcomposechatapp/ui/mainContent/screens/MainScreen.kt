@@ -28,10 +28,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.navigation.BottomNavigationBar
-import com.example.jetpackcomposechatapp.navigation.graphs.MainNavGraph
+import com.example.jetpackcomposechatapp.navigation.graphs.HomeNavGraph
 import com.example.jetpackcomposechatapp.uiComponents.ExtendedFloatingButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.FloatingActionButtonComponent
-import com.example.jetpackcomposechatapp.utils.MainRouteScreen
+import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
 import com.example.jetpackcomposechatapp.utils.bottomNavigationItemList
 import kotlinx.coroutines.delay
 
@@ -66,20 +66,20 @@ fun MainScreen(
         },
         floatingActionButton = {
             if (!currentRoute.isNullOrEmpty()) {
-                if (currentRoute == MainRouteScreen.ChatListScreen.route) {
+                if (currentRoute == HomeRouteScreen.ChatListScreen.route) {
                     ExtendedFloatingButtonComponent(
                         icon = Icons.Filled.PersonAdd,
                         buttonText = R.string.add_chat
                     ) {
-                        homeNavController.navigate(MainRouteScreen.ContactsScreen.route)
+                        homeNavController.navigate(HomeRouteScreen.ContactsScreen.route)
                     }
-                } else if (currentRoute == MainRouteScreen.StatusListScreen.route) {
+                } else if (currentRoute == HomeRouteScreen.StatusListScreen.route) {
                     UpdatesScreenFloatingButtons()
                 }
             }
         }
     ) { innerPadding ->
-        MainNavGraph(
+        HomeNavGraph(
             rootNavController = rootNavController,
             homeNavController = homeNavController,
             paddingValues = innerPadding

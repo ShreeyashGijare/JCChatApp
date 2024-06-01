@@ -161,7 +161,7 @@ class SignUpViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val user = auth.currentUser
-            val uid = auth.currentUser?.uid
+            val uid = user?.uid
             val userData = UserData(
                 userId = uid,
                 name = name ?: currentUser.value?.name,
@@ -180,7 +180,7 @@ class SignUpViewModel @Inject constructor(
                                     if (snapShot.exists()) {
                                         //update the user
                                     } else {
-                                        db.collection(USER_NODE).document().set(userData)
+                                        db.collection(USER_NODE).document(uid).set(userData)
                                         inProgress.value = false
                                         getUserData(uid)
                                     }

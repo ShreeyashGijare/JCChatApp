@@ -3,7 +3,8 @@ package com.example.jetpackcomposechatapp.utils
 object Graph {
     const val ROOT_GRAPH = "ROOT_GRAPH"
     const val AUTHENTICATION_GRAPH = "AUTH_GRAPH"
-    const val MAIN_SCREEN_GRAPH = "HOME_GRAPH"
+    const val HOME_GRAPH = "HOME_GRAPH"
+    const val MAIN_CONTENT_GRAPH = "MAIN_CONTENT_GRAPH"
 }
 
 sealed class AuthRouteScreen(val route: String) {
@@ -12,11 +13,13 @@ sealed class AuthRouteScreen(val route: String) {
 
 }
 
-sealed class MainRouteScreen(val route: String) {
+sealed class HomeRouteScreen(val route: String) {
 
-    object ProfileScreen : MainRouteScreen("Profile")
-    object ChatListScreen : MainRouteScreen("ChatList")
-    object StatusListScreen : MainRouteScreen("Status")
-    object ContactsScreen: MainRouteScreen("Contacts")
+    object ProfileScreen : HomeRouteScreen("Profile")
+    object ChatListScreen : HomeRouteScreen("ChatList")
+    object StatusListScreen : HomeRouteScreen("Status")
+
+    object ContactsScreen : HomeRouteScreen("Contacts")
+
 
 }
