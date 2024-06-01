@@ -59,17 +59,6 @@ class ContactsViewModel @Inject constructor(
 
 
     fun getAllAvailableUsers() {
-
-        /*var userData = UserData()
-        db.collection(USER_NODE).get().await().map {
-            val result = it.toObject(UserData::class.java)
-            userData = result
-            Log.i("USDUISABFIUDF", userData.toString())
-        }*/
-
-        
-
-
         db.collection(USER_NODE)
             .addSnapshotListener { value, error ->
                 if (error != null) {
@@ -81,10 +70,7 @@ class ContactsViewModel @Inject constructor(
 
                 }
             }
-
     }
-
-
 }
 
 data class Contact(val name: String, val phoneNumber: String)
