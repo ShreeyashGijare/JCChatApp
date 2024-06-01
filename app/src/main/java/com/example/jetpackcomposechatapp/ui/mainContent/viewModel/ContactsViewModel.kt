@@ -67,6 +67,8 @@ class ContactsViewModel @Inject constructor(
             Log.i("USDUISABFIUDF", userData.toString())
         }*/
 
+        
+
 
         db.collection(USER_NODE)
             .addSnapshotListener { value, error ->
