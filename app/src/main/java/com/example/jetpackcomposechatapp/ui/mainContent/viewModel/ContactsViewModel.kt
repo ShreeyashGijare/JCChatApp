@@ -4,14 +4,15 @@ import android.content.Context
 import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.utils.Constants.USER_NODE
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +21,19 @@ class ContactsViewModel @Inject constructor(
     private val db: FirebaseFirestore
 ) : ViewModel() {
 
-    fun fetchContacts(context: Context): List<Contact> {
+
+    private var uniqueContacts: List<Contact> = ArrayList()
+    var availableUsersToChat: MutableList<UserData> = ArrayList()
+
+
+    fun getUserListToAddNewChat(context: Context) {
+        viewModelScope.launch(Dispatchers.Default) {
+            removeDuplicateContacts(fetchContacts(context))
+            getAllAvailableUsers()
+        }
+    }
+
+    private fun fetchContacts(context: Context): List<Contact> {
         val contactList = mutableListOf<Contact>()
         val contentResolver = context.contentResolver
         val cursor = contentResolver.query(
@@ -30,7 +43,6 @@ class ContactsViewModel @Inject constructor(
             null,
             null
         )
-
         cursor?.use {
             val nameIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
             val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
@@ -43,10 +55,10 @@ class ContactsViewModel @Inject constructor(
         return contactList
     }
 
-    fun removeDuplicateContacts(contacts: List<Contact>): List<Contact> {
+    private fun removeDuplicateContacts(contacts: List<Contact>) {
         val seenNames = mutableSetOf<String>()
-        val uniqueContacts = contacts.toMutableList()
-        uniqueContacts.removeAll { (name, _) ->
+        uniqueContacts = contacts.toMutableList()
+        (uniqueContacts as MutableList<Contact>).removeAll { (name, _) ->
             if (seenNames.contains(name)) {
                 true
             } else {
@@ -54,22 +66,31 @@ class ContactsViewModel @Inject constructor(
                 false
             }
         }
-        return uniqueContacts
+        uniqueContacts = uniqueContacts.map { contact ->
+            contact.copy(
+                phoneNumber = contact.phoneNumber.replace("+91", "").replace(" ", "")
+                    .replace("-", "")
+            )
+        }
     }
 
-
-    fun getAllAvailableUsers() {
-        db.collection(USER_NODE)
-            .addSnapshotListener { value, error ->
-                if (error != null) {
-                    Log.i("USDUISABFIUDF", error.message.toString())
+    private fun getAllAvailableUsers() {
+        viewModelScope.launch {
+            db.collection(USER_NODE)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                    }
+                    if (value != null) {
+                        val availableUserList = value.toObjects<UserData>()
+                        val uniqueAvailableUsersList = availableUserList.map { it.number }.toSet()
+                        val uniqueContactList = uniqueContacts.map { it.phoneNumber }.toSet()
+                        val mergedListAvailableUsersAndContacts = uniqueAvailableUsersList.intersect(uniqueContactList)
+                        availableUsersToChat =
+                            availableUserList.filter { it.number in mergedListAvailableUsersAndContacts }.toMutableList()
+                        Log.i("uidbfbfibudsf", availableUsersToChat.toString())
+                    }
                 }
-                if (value != null) {
-                    val userList = value.toObjects<UserData>()
-                    Log.i("USDUISABFIUDF", userList.toString())
-
-                }
-            }
+        }
     }
 }
 

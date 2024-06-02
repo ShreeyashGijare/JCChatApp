@@ -135,21 +135,24 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun signUp(name: String, number: String, email: String, password: String) {
-        inProgress.value = true
-        db.collection(NUMBER_SUB_NODE).whereEqualTo("number", number).get().addOnSuccessListener {
-            if (it.isEmpty) {
-                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.i("SIGNUP", "SIGNUP")
-                        createOrUpdateProfile(name, number)
-                    } else {
-                        Log.i("SIGNUP", "Error")
-                        handleException(task.exception, customMessage = "Sign Up Failed")
+
+        viewModelScope.launch {
+            inProgress.value = true
+            db.collection(NUMBER_SUB_NODE).whereEqualTo("number", number).get().addOnSuccessListener {
+                if (it.isEmpty) {
+                    auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.i("SIGNUP", "SIGNUP")
+                            createOrUpdateProfile(name, number)
+                        } else {
+                            Log.i("SIGNUP", "Error")
+                            handleException(task.exception, customMessage = "Sign Up Failed")
+                        }
                     }
+                } else {
+                    inProgress.value = false
+                    handleException(customMessage = "The user already exists")
                 }
-            } else {
-                inProgress.value = false
-                handleException(customMessage = "The user already exists")
             }
         }
     }
@@ -198,16 +201,18 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun getUserData(uid: String) {
-        inProgress.value = true
-        db.collection(USER_NODE).document(uid).addSnapshotListener { value, error ->
-            if (error != null) {
-                handleException(error, "Cannot Retrieve User")
-            }
-            if (value != null) {
-                val user = value.toObject<UserData>()
-                this.currentUser.value = user
-                inProgress.value = false
-                _SignInSuccess.value = true
+        viewModelScope.launch {
+            inProgress.value = true
+            db.collection(USER_NODE).document(uid).addSnapshotListener { value, error ->
+                if (error != null) {
+                    handleException(error, "Cannot Retrieve User")
+                }
+                if (value != null) {
+                    val user = value.toObject<UserData>()
+                    currentUser.value = user
+                    inProgress.value = false
+                    _SignInSuccess.value = true
+                }
             }
         }
     }

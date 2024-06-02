@@ -2,7 +2,10 @@ package com.example.jetpackcomposechatapp.ui.mainContent.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
@@ -47,22 +50,73 @@ fun MainScreen(
             navBackStackEntry?.destination?.route
         }
     }
+
+    var isFloatingButtonVisible by remember {
+        mutableStateOf(false)
+    }
+
+
+    var bottomAppBarVisible by remember { mutableStateOf(true) }
+
+
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(
-                items = bottomNavigationItemList,
-                currentRoute = currentRoute
-            ) { currentNavigationItem ->
-                homeNavController.navigate(currentNavigationItem.route) {
-                    homeNavController.graph.startDestinationRoute?.let { startDestinationRoute ->
-                        popUpTo(startDestinationRoute) {
-                            saveState = true
+            /*AnimatedVisibility(
+                visible = bottomAppBarVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(durationMillis = 500)
+                ) + fadeIn(),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(durationMillis = 500)
+                ) + fadeOut()
+            ) {
+                BottomNavigationBar(
+                    items = bottomNavigationItemList,
+                    currentRoute = currentRoute
+                ) { currentNavigationItem ->
+                    homeNavController.navigate(currentNavigationItem.route) {
+                        homeNavController.graph.startDestinationRoute?.let { startDestinationRoute ->
+                            popUpTo(startDestinationRoute) {
+                                saveState = true
+                            }
                         }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                    launchSingleTop = true
-                    restoreState = true
                 }
+            }*/
+
+
+            if (bottomAppBarVisible)
+                BottomNavigationBar(
+                    items = bottomNavigationItemList,
+                    currentRoute = currentRoute
+                ) { currentNavigationItem ->
+                    homeNavController.navigate(currentNavigationItem.route) {
+                        homeNavController.graph.startDestinationRoute?.let { startDestinationRoute ->
+                            popUpTo(startDestinationRoute) {
+                                saveState = true
+                            }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+
+
+            if (!currentRoute.isNullOrEmpty()) {
+                bottomAppBarVisible = currentRoute == HomeRouteScreen.ChatListScreen.route ||
+                        currentRoute == HomeRouteScreen.StatusListScreen.route ||
+                        currentRoute == HomeRouteScreen.ProfileScreen.route
+
+
+                isFloatingButtonVisible =
+                    currentRoute == HomeRouteScreen.StatusListScreen.route
             }
+
+
         },
         floatingActionButton = {
             if (!currentRoute.isNullOrEmpty()) {
@@ -71,10 +125,19 @@ fun MainScreen(
                         icon = Icons.Filled.PersonAdd,
                         buttonText = R.string.add_chat
                     ) {
+                        bottomAppBarVisible = !bottomAppBarVisible
                         homeNavController.navigate(HomeRouteScreen.ContactsScreen.route)
                     }
                 } else if (currentRoute == HomeRouteScreen.StatusListScreen.route) {
-                    UpdatesScreenFloatingButtons()
+                    UpdatesScreenFloatingButtons(
+                        isVisible = isFloatingButtonVisible,
+                        onPrimaryButtonClick = {
+
+                        },
+                        onSecondaryButtonClick = {
+
+                        }
+                    )
                 }
             }
         }
@@ -89,45 +152,49 @@ fun MainScreen(
 
 
 @Composable
-fun UpdatesScreenFloatingButtons() {
+fun UpdatesScreenFloatingButtons(
+    isVisible: Boolean,
+    onPrimaryButtonClick: () -> Unit,
+    onSecondaryButtonClick: () -> Unit,
+) {
     Column(
         horizontalAlignment = Alignment.End
     ) {
-        AnimatedTextUpdateButton {
-
+        AnimatedTextUpdateButton(isVisible = isVisible) {
+            onSecondaryButtonClick()
         }
         Spacer(modifier = Modifier.height(10.dp))
         ExtendedFloatingButtonComponent(
             icon = Icons.Filled.Update,
             buttonText = R.string.add_update
         ) {
-
+            onPrimaryButtonClick()
         }
     }
 }
 
 @Composable
 fun AnimatedTextUpdateButton(
-    onClick: () -> Unit
+    isVisible: Boolean,
+    onSecondaryButtonClick: () -> Unit
 ) {
-    var isVisible by remember { mutableStateOf(false) }
+    /*var isVisible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        delay(100) // Optional delay before the animation starts
         isVisible = true
-    }
+    }*/
     AnimatedVisibility(
         visible = isVisible,
         enter = slideInVertically(
-            initialOffsetY = { it }, // Slide in from the bottom
+            initialOffsetY = { it },
             animationSpec = tween(durationMillis = 300)
         ),
         exit = slideOutVertically(
-            targetOffsetY = { it }, // Slide out to the bottom
+            targetOffsetY = { it },
             animationSpec = tween(durationMillis = 300)
         )
     ) {
         FloatingActionButtonComponent(icon = Icons.Filled.Edit) {
-            onClick()
+            onSecondaryButtonClick()
         }
     }
 }
