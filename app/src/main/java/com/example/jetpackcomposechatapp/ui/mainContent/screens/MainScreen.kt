@@ -2,10 +2,7 @@ package com.example.jetpackcomposechatapp.ui.mainContent.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
@@ -17,7 +14,6 @@ import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +32,6 @@ import com.example.jetpackcomposechatapp.uiComponents.ExtendedFloatingButtonComp
 import com.example.jetpackcomposechatapp.uiComponents.FloatingActionButtonComponent
 import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
 import com.example.jetpackcomposechatapp.utils.bottomNavigationItemList
-import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -54,7 +49,6 @@ fun MainScreen(
     var isFloatingButtonVisible by remember {
         mutableStateOf(false)
     }
-
 
     var bottomAppBarVisible by remember { mutableStateOf(true) }
 
@@ -105,18 +99,14 @@ fun MainScreen(
                     }
                 }
 
-
             if (!currentRoute.isNullOrEmpty()) {
                 bottomAppBarVisible = currentRoute == HomeRouteScreen.ChatListScreen.route ||
                         currentRoute == HomeRouteScreen.StatusListScreen.route ||
                         currentRoute == HomeRouteScreen.ProfileScreen.route
 
-
                 isFloatingButtonVisible =
                     currentRoute == HomeRouteScreen.StatusListScreen.route
             }
-
-
         },
         floatingActionButton = {
             if (!currentRoute.isNullOrEmpty()) {

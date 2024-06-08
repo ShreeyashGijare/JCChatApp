@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
@@ -43,7 +44,7 @@ fun ChatListScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        BodySmallComponent(textValue = R.string.sign_out) {
+        BodySmallComponent(textValue = stringResource(id = R.string.sign_out)) {
             coroutineScope.launch {
                 if (signOutUser()) {
                     navController.popBackStack()
@@ -73,7 +74,8 @@ suspend fun signOutUser(): Boolean {
 
 @Composable
 fun LetterByLetterAnimatedText() {
-    val text = "This text animates as though it is being typed \uD83E\uDDDE\u200D♀\uFE0F \uD83D\uDD10  \uD83D\uDC69\u200D❤\uFE0F\u200D\uD83D\uDC68 \uD83D\uDC74\uD83C\uDFFD"
+    val text =
+        "This text animates as though it is being typed \uD83E\uDDDE\u200D♀\uFE0F \uD83D\uDD10  \uD83D\uDC69\u200D❤\uFE0F\u200D\uD83D\uDC68 \uD83D\uDC74\uD83C\uDFFD"
 
     val breakIterator = remember(text) { BreakIterator.getCharacterInstance() }
     val typingDelayInMs = 50L

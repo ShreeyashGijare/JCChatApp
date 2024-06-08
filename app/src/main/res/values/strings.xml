@@ -15,5 +15,10 @@
 
     <string name="add_chat">Add Chat</string>
     <string name="add_update">Add Update</string>
+    <string name="select_contact">Select contact</string>
+    <string name="contacts_available">Contacts Available</string>
+    <string name="refresh_contacts">Refresh Contacts</string>
+    <string name="search_button">Search Button</string>
+    <string name="back_arrow">Back Arrow</string>
 
 </resources>

@@ -1,5 +1,8 @@
 package com.example.jetpackcomposechatapp.navigation.graphs
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -26,17 +29,76 @@ fun HomeNavGraph(
         startDestination = HomeRouteScreen.ChatListScreen.route,
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(HomeRouteScreen.ChatListScreen.route) {
+        composable(
+            HomeRouteScreen.ChatListScreen.route,
+            enterTransition = {
+                fadeIn(
+                    initialAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    targetAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            }
+        ) {
             ChatListScreen(navController = rootNavController)
         }
-        composable(HomeRouteScreen.StatusListScreen.route) {
+
+        composable(
+            HomeRouteScreen.StatusListScreen.route,
+            enterTransition = {
+                fadeIn(
+                    initialAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    targetAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            }
+        ) {
             StatusListScreen(navController = rootNavController)
         }
-        composable(HomeRouteScreen.ProfileScreen.route) {
+
+        composable(
+            HomeRouteScreen.ProfileScreen.route,
+            enterTransition = {
+                fadeIn(
+                    initialAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    targetAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            }
+        ) {
             ProfileScreen(navController = rootNavController)
         }
-        composable(HomeRouteScreen.ContactsScreen.route) {
-            ContactsScreen(navController = rootNavController)
+
+        composable(
+            HomeRouteScreen.ContactsScreen.route,
+            enterTransition = {
+                fadeIn(
+                    initialAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    targetAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            }
+        ) {
+            ContactsScreen(navController = homeNavController)
         }
     }
 }

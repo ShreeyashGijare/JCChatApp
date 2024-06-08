@@ -3,6 +3,9 @@ package com.example.jetpackcomposechatapp.ui.mainContent.viewModel
 import android.content.Context
 import android.provider.ContactsContract
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetpackcomposechatapp.data.userData.UserData
@@ -23,7 +26,11 @@ class ContactsViewModel @Inject constructor(
 
 
     private var uniqueContacts: List<Contact> = ArrayList()
-    var availableUsersToChat: MutableList<UserData> = ArrayList()
+
+    private val _availableUsersToChat: MutableState<MutableList<UserData>> =
+        mutableStateOf(ArrayList())
+    var availableUsersToChat: State<MutableList<UserData>> =
+        _availableUsersToChat
 
 
     fun getUserListToAddNewChat(context: Context) {
@@ -84,11 +91,19 @@ class ContactsViewModel @Inject constructor(
                         val availableUserList = value.toObjects<UserData>()
                         val uniqueAvailableUsersList = availableUserList.map { it.number }.toSet()
                         val uniqueContactList = uniqueContacts.map { it.phoneNumber }.toSet()
-                        val mergedListAvailableUsersAndContacts = uniqueAvailableUsersList.intersect(uniqueContactList)
-                        availableUsersToChat =
-                            availableUserList.filter { it.number in mergedListAvailableUsersAndContacts }.toMutableList()
-                        Log.i("uidbfbfibudsf", availableUsersToChat.toString())
+                        val mergedListAvailableUsersAndContacts =
+                            uniqueAvailableUsersList.intersect(uniqueContactList)
+
+                        /*_availableUsersToChat.emit(availableUserList.filter { it.number in mergedListAvailableUsersAndContacts }
+                            .toMutableList())*/
+                        _availableUsersToChat.value =
+                            availableUserList.filter { it.number in mergedListAvailableUsersAndContacts }
+                                .toMutableList()
+
+
+                        Log.i("uidbfbfibudsf", _availableUsersToChat.toString())
                     }
+
                 }
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,7 +78,10 @@ fun SignUpScreen(
                 .padding(8.dp)
         )
         Spacer(modifier = Modifier.heightIn(10.dp))
-        HeadLineMediumComponent(textValue = R.string.sign_up, modifier = Modifier.heightIn(80.dp))
+        HeadLineMediumComponent(
+            textValue = stringResource(id = R.string.sign_up),
+            modifier = Modifier.heightIn(80.dp)
+        )
         Spacer(modifier = Modifier.heightIn(20.dp))
         OutlinedTextFieldComponent(
             labelValue = "Enter your Name",
@@ -126,7 +130,7 @@ fun SignUpScreen(
             viewModel.onEvent(SignUpEvents.SignUpButtonClick)
         }
         Spacer(modifier = Modifier.heightIn(10.dp))
-        BodySmallComponent(textValue = R.string.already_have_account) {
+        BodySmallComponent(textValue = stringResource(id = R.string.already_have_account)) {
             rootNavController.popBackStack()
             navigateUpTo(rootNavController, AuthRouteScreen.LoginScreen.route)
         }
