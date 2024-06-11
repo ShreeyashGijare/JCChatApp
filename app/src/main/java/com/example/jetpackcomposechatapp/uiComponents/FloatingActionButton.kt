@@ -1,10 +1,13 @@
 package com.example.jetpackcomposechatapp.uiComponents
 
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 
@@ -30,6 +33,7 @@ fun FloatingActionButtonComponent(
     onClick: () -> Unit
 ) {
     FloatingActionButton(
+        modifier = Modifier.clip(CircleShape),
         onClick = { onClick() }
     ) {
         Icon(icon, "Small floating action button.")

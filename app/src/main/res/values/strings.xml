@@ -21,4 +21,8 @@
     <string name="search_button">Search Button</string>
     <string name="back_arrow">Back Arrow</string>
 
+    <string name="total_contacts">Showing %1$s contacts</string>
+    <string name="type_a_message">Type a message</string>
+    <string name="attach">Attach</string>
+
 </resources>

@@ -39,6 +39,21 @@ fun HeadLineSmallComponent(
 }
 
 @Composable
+fun BodyLargeComponent(
+    textValue: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary
+) {
+    Text(
+        text = textValue,
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier,
+        color = color,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
 fun BodyMediumComponent(
     textValue: String,
     modifier: Modifier = Modifier,

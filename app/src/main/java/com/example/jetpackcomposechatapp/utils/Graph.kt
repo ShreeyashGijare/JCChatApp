@@ -4,7 +4,6 @@ object Graph {
     const val ROOT_GRAPH = "ROOT_GRAPH"
     const val AUTHENTICATION_GRAPH = "AUTH_GRAPH"
     const val HOME_GRAPH = "HOME_GRAPH"
-    const val MAIN_CONTENT_GRAPH = "MAIN_CONTENT_GRAPH"
 }
 
 sealed class AuthRouteScreen(val route: String) {
@@ -20,6 +19,7 @@ sealed class HomeRouteScreen(val route: String) {
     object StatusListScreen : HomeRouteScreen("Status")
 
     object ContactsScreen : HomeRouteScreen("Contacts")
+    object ChatScreen : HomeRouteScreen("Chat/{userData}")
 
 
 }

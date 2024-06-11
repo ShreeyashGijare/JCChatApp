@@ -24,14 +24,12 @@ class ContactsViewModel @Inject constructor(
     private val db: FirebaseFirestore
 ) : ViewModel() {
 
-
     private var uniqueContacts: List<Contact> = ArrayList()
 
     private val _availableUsersToChat: MutableState<MutableList<UserData>> =
         mutableStateOf(ArrayList())
     var availableUsersToChat: State<MutableList<UserData>> =
         _availableUsersToChat
-
 
     fun getUserListToAddNewChat(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
@@ -93,14 +91,9 @@ class ContactsViewModel @Inject constructor(
                         val uniqueContactList = uniqueContacts.map { it.phoneNumber }.toSet()
                         val mergedListAvailableUsersAndContacts =
                             uniqueAvailableUsersList.intersect(uniqueContactList)
-
-                        /*_availableUsersToChat.emit(availableUserList.filter { it.number in mergedListAvailableUsersAndContacts }
-                            .toMutableList())*/
                         _availableUsersToChat.value =
                             availableUserList.filter { it.number in mergedListAvailableUsersAndContacts }
                                 .toMutableList()
-
-
                         Log.i("uidbfbfibudsf", _availableUsersToChat.toString())
                     }
 

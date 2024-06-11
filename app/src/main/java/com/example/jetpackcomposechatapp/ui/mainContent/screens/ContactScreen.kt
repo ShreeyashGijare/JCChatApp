@@ -24,7 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -48,11 +48,14 @@ import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ContactsViewModel
 import com.example.jetpackcomposechatapp.uiComponents.BodyMediumComponent
+import com.example.jetpackcomposechatapp.uiComponents.LabelLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
+import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
+import com.google.gson.Gson
 
 @Composable
 fun ContactsScreen(
-    navController: NavController,
+    homeNavController: NavController,
     viewModel: ContactsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -80,11 +83,17 @@ fun ContactsScreen(
             }
         }
     }
-
     Column {
         TopBar(
+            viewModel = viewModel,
             onBackArrowClick = {
-                navController.popBackStack()
+                homeNavController.popBackStack()
+            },
+            onSearchButtonClick = {
+
+            },
+            onRefreshClick = {
+                viewModel.getUserListToAddNewChat(context)
             }
         )
         LazyColumn(
@@ -95,7 +104,17 @@ fun ContactsScreen(
         ) {
             items(availableContacts/*.sortedBy { it.name }*/) { user ->
                 Log.i("uidbfbfibudsf_sdsadsa___", user.name!!)
-                AvailableUsersItem(user = user)
+                AvailableUsersItem(user = user) { userData ->
+                    homeNavController.navigate(
+                        "${HomeRouteScreen.ChatScreen.route}?userData=${
+                            Gson().toJson(
+                                userData
+                            )
+                        }"
+                    ) {
+                        homeNavController.popBackStack(HomeRouteScreen.ContactsScreen.route, true)
+                    }
+                }
             }
         }
     }
@@ -104,7 +123,10 @@ fun ContactsScreen(
 
 @Composable
 fun TopBar(
-    onBackArrowClick: () -> Unit
+    viewModel: ContactsViewModel,
+    onBackArrowClick: () -> Unit,
+    onSearchButtonClick: () -> Unit,
+    onRefreshClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.padding(horizontal = 15.dp)
@@ -116,7 +138,7 @@ fun TopBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(R.string.back_arrow),
                 modifier = Modifier
                     .weight(.2f)
@@ -131,36 +153,52 @@ fun TopBar(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 LabelSmallComponent(
-                    textValue = stringResource(id = R.string.select_contact),
+                    textValue = stringResource(
+                        id = R.string.total_contacts,
+                        viewModel.availableUsersToChat.value.size
+                    ),
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = stringResource(R.string.search_button),
-                modifier = Modifier.weight(.2f)
+                modifier = Modifier
+                    .weight(.2f)
+                    .clickable {
+                        onSearchButtonClick()
+                    }
             )
             Spacer(modifier = Modifier.weight(.1f))
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = stringResource(R.string.refresh_contacts),
-                modifier = Modifier.weight(.2f)
+                modifier = Modifier
+                    .weight(.2f)
+                    .clickable {
+                        onRefreshClick()
+                    }
             )
         }
         Spacer(modifier = Modifier.height(5.dp))
         Text(text = stringResource(R.string.contacts_available))
     }
-
-
 }
 
 @Composable
 fun AvailableUsersItem(
-    user: UserData
+    user: UserData,
+    onClick: (UserData) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 5.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick(user)
+            }
+            .padding(vertical = 5.dp)
+
     ) {
         Image(
             painter = if (user.imageUrl != null) rememberImagePainter(data = user.imageUrl) else painterResource(
@@ -179,7 +217,7 @@ fun AvailableUsersItem(
         Column(
             modifier = Modifier.padding(start = 15.dp)
         ) {
-            BodyMediumComponent(
+            LabelLargeComponent(
                 textValue = user.name!!,
                 color = MaterialTheme.colorScheme.onBackground
             )
