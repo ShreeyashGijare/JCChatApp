@@ -9,7 +9,6 @@ import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpSt
 import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpEvents
 import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.rules.Validator
 import com.example.jetpackcomposechatapp.data.userData.UserData
-import com.example.jetpackcomposechatapp.utils.Constants.NUMBER_SUB_NODE
 import com.example.jetpackcomposechatapp.utils.Constants.USER_NODE
 import com.example.jetpackcomposechatapp.utils.Events
 import com.google.firebase.auth.FirebaseAuth
@@ -138,20 +137,16 @@ class SignUpViewModel @Inject constructor(
 
         viewModelScope.launch {
             inProgress.value = true
-            db.collection(NUMBER_SUB_NODE).whereEqualTo("number", number).get().addOnSuccessListener {
-                if (it.isEmpty) {
-                    auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.i("SIGNUP", "SIGNUP")
-                            createOrUpdateProfile(name, number)
-                        } else {
-                            Log.i("SIGNUP", "Error")
-                            handleException(task.exception, customMessage = "Sign Up Failed")
-                        }
-                    }
+            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    createOrUpdateProfile(
+                        name = name,
+                        number = number,
+                        email = email
+                    )
                 } else {
-                    inProgress.value = false
-                    handleException(customMessage = "The user already exists")
+                    Log.i("SIGNUP", "Error")
+                    handleException(task.exception, customMessage = "Sign Up Failed")
                 }
             }
         }
@@ -160,7 +155,8 @@ class SignUpViewModel @Inject constructor(
     private fun createOrUpdateProfile(
         name: String? = null,
         number: String? = null,
-        imageUrl: String? = null
+        imageUrl: String? = null,
+        email: String? = null
     ) {
         viewModelScope.launch {
             val user = auth.currentUser
@@ -169,7 +165,8 @@ class SignUpViewModel @Inject constructor(
                 userId = uid,
                 name = name ?: currentUser.value?.name,
                 number = number ?: currentUser.value?.number,
-                imageUrl = imageUrl ?: currentUser.value?.imageUrl
+                imageUrl = imageUrl ?: currentUser.value?.imageUrl,
+                emailId = email ?: currentUser.value?.emailId
             )
             val profileUpdates = UserProfileChangeRequest.Builder()
                 .setDisplayName(userData.name)
@@ -191,7 +188,6 @@ class SignUpViewModel @Inject constructor(
                                     handleException(exception, "Cannot Retrieve User")
                                 }
                         }
-
                     } else {
                         Log.i("ProfileUpdateException", task.exception?.message.toString())
                     }

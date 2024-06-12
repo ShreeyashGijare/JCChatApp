@@ -4,13 +4,15 @@ data class UserData(
     val imageUrl: String? = "",
     val name: String? = "",
     val number: String? = "",
-    val userId: String? = ""
-    ) {
+    val userId: String? = "",
+    val emailId: String? = ""
+) {
 
     fun toMap() = mapOf(
         "imageUrl" to imageUrl,
         "name" to name,
         "number" to number,
-        "userId" to userId
+        "userId" to userId,
+        "emailId" to emailId
     )
 }

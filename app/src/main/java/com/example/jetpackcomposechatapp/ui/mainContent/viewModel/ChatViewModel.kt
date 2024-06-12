@@ -30,7 +30,6 @@ class ChatViewModel @Inject constructor(
             }
 
             ChatEvents.SendButtonClick -> {
-
             }
         }
     }
