@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -26,11 +27,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +44,8 @@ fun OutlinedTextFieldComponent(
     onTextSelected: (String) -> Unit,
     errorMessage: String = "",
     isError: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    fontFamily: FontFamily = interFontFamily
 ) {
 
     var textValue: String by remember {
@@ -50,7 +55,7 @@ fun OutlinedTextFieldComponent(
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         label = {
-            Text(text = labelValue)
+            Text(text = labelValue, fontFamily = fontFamily)
         },
         value = textValue,
         onValueChange = {
@@ -78,7 +83,11 @@ fun OutlinedTextFieldComponent(
         leadingIcon = {
             Icon(imageVector = leadingIcon, contentDescription = null)
         },
-        isError = isError
+        isError = isError,
+        shape = RoundedCornerShape(15.dp),
+        textStyle = TextStyle(
+            fontFamily = fontFamily
+        )
     )
     Spacer(modifier = Modifier.height(10.dp))
     if (isError) {
@@ -100,7 +109,8 @@ fun PasswordTextFieldComponent(
     labelValue: String,
     onTextSelected: (String) -> Unit,
     isError: Boolean = false,
-    errorMessage: String = ""
+    errorMessage: String = "",
+    fontFamily: FontFamily = interFontFamily
 ) {
 
     var textValue: String by remember {
@@ -114,7 +124,7 @@ fun PasswordTextFieldComponent(
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         label = {
-            Text(text = labelValue)
+            Text(text = labelValue, fontFamily = fontFamily)
         },
         value = textValue,
         onValueChange = {
@@ -154,7 +164,11 @@ fun PasswordTextFieldComponent(
             }
         },
         visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-        isError = isError
+        isError = isError,
+        shape = RoundedCornerShape(15.dp),
+        textStyle = TextStyle(
+            fontFamily = fontFamily
+        )
     )
     Spacer(modifier = Modifier.height(10.dp))
     if (isError) {
