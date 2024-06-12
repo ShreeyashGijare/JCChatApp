@@ -2,9 +2,32 @@ package com.example.jetpackcomposechatapp.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.jetpackcomposechatapp.R
+
+
+var interFontFamily = FontFamily(
+    Font(R.font.inter_regular, FontWeight.Normal)
+)
+
+var interFontFamilyMedium = FontFamily(
+    Font(R.font.inter_medium, FontWeight.Medium)
+)
+
+var interFontFamilySemiBold = FontFamily(
+    Font(R.font.inter_semibold, FontWeight.SemiBold)
+)
+
+var interFontFamilyBold = FontFamily(
+    Font(R.font.inter_bold, FontWeight.Bold)
+)
+
+var interFontFamilyExtraBold = FontFamily(
+    Font(R.font.inter_extrabold, FontWeight.ExtraBold)
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(

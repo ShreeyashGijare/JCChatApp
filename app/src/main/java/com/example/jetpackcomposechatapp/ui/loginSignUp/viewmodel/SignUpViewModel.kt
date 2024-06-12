@@ -35,19 +35,8 @@ class SignUpViewModel @Inject constructor(
     var inProgress = mutableStateOf(false)
     private val eventMutableState = mutableStateOf<Events<String>?>(null)
 
-
     private val _SignInSuccess = MutableStateFlow(false)
     var signInSuccess: StateFlow<Boolean> = _SignInSuccess
-
-    var currentUser = mutableStateOf<UserData?>(null)
-
-    init {
-        val currentUser = auth.currentUser
-        _SignInSuccess.value = currentUser != null
-        currentUser?.uid?.let {
-            getUserData(it)
-        }
-    }
 
     fun onEvent(event: SignUpEvents) {
         when (event) {
@@ -163,10 +152,10 @@ class SignUpViewModel @Inject constructor(
             val uid = user?.uid
             val userData = UserData(
                 userId = uid,
-                name = name ?: currentUser.value?.name,
-                number = number ?: currentUser.value?.number,
-                imageUrl = imageUrl ?: currentUser.value?.imageUrl,
-                emailId = email ?: currentUser.value?.emailId
+                name = name,
+                number = number,
+                imageUrl = imageUrl,
+                emailId = email
             )
             val profileUpdates = UserProfileChangeRequest.Builder()
                 .setDisplayName(userData.name)
@@ -205,7 +194,6 @@ class SignUpViewModel @Inject constructor(
                 }
                 if (value != null) {
                     val user = value.toObject<UserData>()
-                    currentUser.value = user
                     inProgress.value = false
                     _SignInSuccess.value = true
                 }

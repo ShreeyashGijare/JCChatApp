@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,7 +62,9 @@ fun ChatScreen(
 ) {
 
     //background color for chat bubble MaterialTheme.colorScheme.primaryContainer
-
+    LaunchedEffect(key1 = Unit) {
+        viewModel.setReceiverUser(userData)
+    }
 
     val listOfMessages = mutableListOf<Message>(
         Message("Hi", true),
