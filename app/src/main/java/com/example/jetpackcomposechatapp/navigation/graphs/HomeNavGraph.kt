@@ -26,7 +26,8 @@ import com.google.gson.Gson
 fun HomeNavGraph(
     rootNavController: NavHostController,
     homeNavController: NavHostController,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    onShowSnackBar: (String) -> Unit
 ) {
     NavHost(
         navController = homeNavController,
@@ -49,7 +50,9 @@ fun HomeNavGraph(
                 )
             }
         ) {
-            ChatListScreen(navController = rootNavController)
+            ChatListScreen(navController = rootNavController, onShowSnackBar = { message ->
+                onShowSnackBar(message)
+            })
         }
 
         composable(

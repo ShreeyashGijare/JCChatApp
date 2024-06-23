@@ -5,7 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -41,7 +40,6 @@ import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatListViewModel
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyExtraBold
-import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
@@ -50,6 +48,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.BreakIterator
@@ -58,13 +57,22 @@ import java.text.StringCharacterIterator
 @Composable
 fun ChatListScreen(
     navController: NavController,
-    viewModel: ChatListViewModel = hiltViewModel()
+    viewModel: ChatListViewModel = hiltViewModel(),
+    onShowSnackBar: (String) -> Unit
 ) {
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
     val chatList by viewModel.chatUserList.collectAsState()
+
+    LaunchedEffect(key1 = viewModel.error) {
+        viewModel.error.collectLatest {
+            if (it.isError) {
+                onShowSnackBar(it.errorMessage)
+            }
+        }
+    }
 
 
     Column {

@@ -61,107 +61,10 @@ fun ChatScreen(
 
 ) {
 
-    //background color for chat bubble MaterialTheme.colorScheme.primaryContainer
     LaunchedEffect(key1 = Unit) {
         viewModel.setReceiverUser(userData)
     }
 
-    val listOfMessages = mutableListOf<Message>(
-        Message("Hi", true),
-        Message("Shreeyash, This Side", true),
-        Message("Hey, Shreeyash", false),
-        Message("How are you", false),
-        Message("I am good", true),
-        Message(
-            "Actually, I am working as an Android Developer for the past 2 years and now I am looking to switch!!",
-            true
-        ),
-        Message(
-            "I know you have some great contacts, so I ws hoping that you could help me!!!",
-            true
-        ),
-        Message(
-            "Yes, I think my company has some requirement for the role as an Android Developer, and I think the job matches your profile too",
-            false
-        ),
-        Message("Share me your resume, I will forward tah to the HR department.", false),
-        Message("Thank you so much I am looking forward to hear from you.", true),
-        Message("You're Welcome, I will be in touch with you", false),
-        Message("I will also share your resume to some of my friends too", false),
-        Message("Thanks!!", true),
-        Message("Anything else?", true),
-        Message("Hi", true),
-        Message("Shreeyash, This Side", true),
-        Message("Hey, Shreeyash", false),
-        Message("How are you", false),
-        Message("I am good", true),
-        Message(
-            "Actually, I am working as an Android Developer for the past 2 years and now I am looking to switch!!",
-            true
-        ),
-        Message(
-            "I know you have some great contacts, so I ws hoping that you could help me!!!",
-            true
-        ),
-        Message(
-            "Yes, I think my company has some requirement for the role as an Android Developer, and I think the job matches your profile too",
-            false
-        ),
-        Message("Share me your resume, I will forward tah to the HR department.", false),
-        Message("Thank you so much I am looking forward to hear from you.", true),
-        Message("You're Welcome, I will be in touch with you", false),
-        Message("I will also share your resume to some of my friends too", false),
-        Message("Thanks!!", true),
-        Message("Anything else?", true),
-        Message("Hi", true),
-        Message("Shreeyash, This Side", true),
-        Message("Hey, Shreeyash", false),
-        Message("How are you", false),
-        Message("I am good", true),
-        Message(
-            "Actually, I am working as an Android Developer for the past 2 years and now I am looking to switch!!",
-            true
-        ),
-        Message(
-            "I know you have some great contacts, so I ws hoping that you could help me!!!",
-            true
-        ),
-        Message(
-            "Yes, I think my company has some requirement for the role as an Android Developer, and I think the job matches your profile too",
-            false
-        ),
-        Message("Share me your resume, I will forward tah to the HR department.", false),
-        Message("Thank you so much I am looking forward to hear from you.", true),
-        Message("You're Welcome, I will be in touch with you", false),
-        Message("I will also share your resume to some of my friends too", false),
-        Message("Thanks!!", true),
-        Message("Anything else?", true),
-        Message("Hi", true),
-        Message("Shreeyash, This Side", true),
-        Message("Hey, Shreeyash", false),
-        Message("How are you", false),
-        Message("I am good", true),
-        Message(
-            "Actually, I am working as an Android Developer for the past 2 years and now I am looking to switch!!",
-            true
-        ),
-        Message(
-            "I know you have some great contacts, so I ws hoping that you could help me!!!",
-            true
-        ),
-        Message(
-            "Yes, I think my company has some requirement for the role as an Android Developer, and I think the job matches your profile too",
-            false
-        ),
-        Message("Share me your resume, I will forward tah to the HR department.", false),
-        Message("Thank you so much I am looking forward to hear from you.", true),
-        Message("You're Welcome, I will be in touch with you", false),
-        Message("I will also share your resume to some of my friends too", false),
-        Message("Thanks!!", true),
-        Message("Anything else?", true)
-    )
-
-    val messages by remember { mutableStateOf(listOfMessages) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -181,9 +84,9 @@ fun ChatScreen(
                 .weight(1f),
             contentPadding = PaddingValues(15.dp)
         ) {
-            items(messages.reversed()) {
+            /*items(messages.reversed()) {
                 MessageItem(message = it)
-            }
+            }*/
         }
         ChatScreenBottomBar(
             onMessageTextChange = {

@@ -13,11 +13,14 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +35,7 @@ import com.example.jetpackcomposechatapp.uiComponents.ExtendedFloatingButtonComp
 import com.example.jetpackcomposechatapp.uiComponents.FloatingActionButtonComponent
 import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
 import com.example.jetpackcomposechatapp.utils.bottomNavigationItemList
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -51,6 +55,9 @@ fun MainScreen(
     }
 
     var bottomAppBarVisible by remember { mutableStateOf(true) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
 
 
     Scaffold(
@@ -130,12 +137,20 @@ fun MainScreen(
                     )
                 }
             }
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
         }
     ) { innerPadding ->
         HomeNavGraph(
             rootNavController = rootNavController,
             homeNavController = homeNavController,
-            paddingValues = innerPadding
+            paddingValues = innerPadding,
+            onShowSnackBar = { message ->
+                scope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
         )
     }
 }
@@ -168,10 +183,6 @@ fun AnimatedTextUpdateButton(
     isVisible: Boolean,
     onSecondaryButtonClick: () -> Unit
 ) {
-    /*var isVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }*/
     AnimatedVisibility(
         visible = isVisible,
         enter = slideInVertically(
