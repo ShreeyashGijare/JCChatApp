@@ -44,8 +44,10 @@ import com.example.jetpackcomposechatapp.uiComponents.HeadLineLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
 import com.example.jetpackcomposechatapp.utils.Graph
+import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -57,6 +59,7 @@ import java.text.StringCharacterIterator
 @Composable
 fun ChatListScreen(
     navController: NavController,
+    homeNavController: NavController,
     viewModel: ChatListViewModel = hiltViewModel(),
     onShowSnackBar: (String) -> Unit
 ) {
@@ -98,8 +101,16 @@ fun ChatListScreen(
             contentPadding = PaddingValues(15.dp)
         ) {
 
-            items(chatList) { user ->
-                UserChatItem(user = user)
+            items(chatList) { userData ->
+                UserChatItem(user = userData) {
+                    homeNavController.navigate(
+                        "${HomeRouteScreen.ChatScreen.route}?userData=${
+                            Gson().toJson(
+                                userData
+                            )
+                        }"
+                    )
+                }
             }
 
         }
@@ -135,13 +146,15 @@ fun TopBar(
 
 @Composable
 fun UserChatItem(
-    user: UserData
+    user: UserData,
+    onClick: (UserData) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
+                onClick.invoke(user)
             }
             .padding(vertical = 5.dp)
 

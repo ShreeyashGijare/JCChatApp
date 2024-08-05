@@ -1,8 +1,8 @@
 package com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.rules
 
-import android.util.Patterns
-
 object Validator {
+
+    private const val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]{2,4}+"
 
     fun userNameValidation(fName: String): ValidationResult {
         return ValidationResult(
@@ -19,15 +19,17 @@ object Validator {
     }
 
 
-    fun emailValidation(email: String): ValidationResult {
 
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            return ValidationResult(
+
+    fun emailValidation(email: String): com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.rules.ValidationResult {
+
+        if (!email.matches(Regex(emailPattern))) {
+            return com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.rules.ValidationResult(
                 status = false,
                 errorMessage = "Enter a valid Email"
             )
         }
-        return ValidationResult(
+        return com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.rules.ValidationResult(
             status = true
         )
     }

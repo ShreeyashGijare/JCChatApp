@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,8 +52,14 @@ import coil.compose.rememberImagePainter
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatEvents
+import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatViewModel
 import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun ChatScreen(
@@ -60,6 +68,11 @@ fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel()
 
 ) {
+
+
+//    val chatMessages = viewModel._chatMessages
+
+    val chatMessages by viewModel.chatMessages.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
         viewModel.setReceiverUser(userData)
@@ -84,9 +97,9 @@ fun ChatScreen(
                 .weight(1f),
             contentPadding = PaddingValues(15.dp)
         ) {
-            /*items(messages.reversed()) {
+            items(chatMessages) {
                 MessageItem(message = it)
-            }*/
+            }
         }
         ChatScreenBottomBar(
             onMessageTextChange = {
@@ -141,33 +154,45 @@ fun ChatScreenTopBar(
 }
 
 @Composable
-fun MessageItem(message: Message) {
+fun MessageItem(message: ChatState) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (message.isSentByUser) Arrangement.End else Arrangement.Start
+        horizontalArrangement = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Arrangement.End else Arrangement.Start
     ) {
-        Card(
-            colors = CardColors(
-                containerColor = if (message.isSentByUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
-                contentColor = if (message.isSentByUser) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primaryContainer,
-                disabledContainerColor = if (message.isSentByUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
-                disabledContentColor = if (message.isSentByUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
-            ),
-            modifier = Modifier
-                .widthIn(20.dp, 300.dp)
-                .padding(8.dp),
-            shape = RoundedCornerShape(
-                topStart = if (message.isSentByUser) 15.dp else 0.dp,
-                topEnd = if (message.isSentByUser) 0.dp else 15.dp,
-                bottomEnd = 15.dp,
-                bottomStart = 15.dp
-            )
-        ) {
+
+        Column {
+            Card(
+                colors = CardColors(
+                    containerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+                    contentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primaryContainer,
+                    disabledContainerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledContentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+                ),
+                modifier = Modifier
+                    .widthIn(20.dp, 300.dp)
+                    .padding(8.dp),
+                shape = RoundedCornerShape(
+                    topStart = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 15.dp else 0.dp,
+                    topEnd = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 0.dp else 15.dp,
+                    bottomEnd = 15.dp,
+                    bottomStart = 15.dp
+                )
+            ) {
+                Text(
+                    text = message.message.toString(),
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(5.dp))
             Text(
-                text = message.text,
-                modifier = Modifier.padding(8.dp)
+                text = convertLongToTimeAMPM(message.timeStamp),
+                style = MaterialTheme.typography.bodySmall
             )
+
         }
+
+
     }
 }
 
@@ -226,4 +251,8 @@ fun ChatScreenBottomBar(
 }
 
 
-data class Message(val text: String, val isSentByUser: Boolean)
+fun convertLongToTimeAMPM(time: Long): String {
+    val date = Date(time)
+    val format = SimpleDateFormat("hh:mm", Locale.getDefault())
+    return format.format(date)
+}

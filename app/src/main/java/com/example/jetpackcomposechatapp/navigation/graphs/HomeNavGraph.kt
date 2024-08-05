@@ -50,7 +50,7 @@ fun HomeNavGraph(
                 )
             }
         ) {
-            ChatListScreen(navController = rootNavController, onShowSnackBar = { message ->
+            ChatListScreen(navController = rootNavController,homeNavController = homeNavController, onShowSnackBar = { message ->
                 onShowSnackBar(message)
             })
         }
