@@ -201,7 +201,7 @@ fun AvailableUsersItem(
 
     ) {
         Image(
-            painter = if (user.imageUrl != null) rememberImagePainter(data = user.imageUrl) else painterResource(
+            painter = if (!user.imageUrl.isNullOrEmpty()) rememberImagePainter(data = user.imageUrl) else painterResource(
                 id = R.drawable.chat_icon_one
             ), contentDescription = "",
             modifier = Modifier

@@ -3,6 +3,7 @@ package com.example.jetpackcomposechatapp.ui.mainContent.screens
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import coil.compose.rememberImagePainter
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
+import com.example.jetpackcomposechatapp.ui.mainContent.data.chatlist.ChatUserObject
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatListViewModel
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyExtraBold
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineLargeComponent
@@ -122,31 +124,28 @@ fun ChatListScreen(
 fun TopBar(
     onClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.padding(horizontal = 15.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(vertical = 10.dp, horizontal = 15.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            HeadLineLargeComponent(
-                modifier = Modifier.clickable {
-                    onClick()
-                },
-                textValue = stringResource(id = R.string.app_name),
-                color = MaterialTheme.colorScheme.onBackground,
-                fontFamily = interFontFamilyExtraBold
-            )
-        }
+        HeadLineLargeComponent(
+            modifier = Modifier.clickable {
+                onClick()
+            },
+            textValue = stringResource(id = R.string.app_name),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontFamily = interFontFamilyExtraBold
+        )
     }
 
 }
 
 @Composable
 fun UserChatItem(
-    user: UserData,
+    user: ChatUserObject,
     onClick: (UserData) -> Unit
 ) {
     Row(
@@ -154,13 +153,20 @@ fun UserChatItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                onClick.invoke(user)
+                val userData = UserData(
+                    imageUrl = user.imageUrl,
+                    name = user.name,
+                    number = user.number,
+                    userId = user.userId,
+                    emailId = user.emailId
+                )
+                onClick.invoke(userData)
             }
             .padding(vertical = 5.dp)
 
     ) {
         Image(
-            painter = if (user.imageUrl != null) rememberImagePainter(data = user.imageUrl) else painterResource(
+            painter = if (!user.imageUrl.isNullOrEmpty()) rememberImagePainter(data = user.imageUrl) else painterResource(
                 id = R.drawable.chat_icon_one
             ), contentDescription = "",
             modifier = Modifier
