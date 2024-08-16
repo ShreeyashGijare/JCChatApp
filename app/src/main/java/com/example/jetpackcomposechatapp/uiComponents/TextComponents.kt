@@ -8,13 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import com.example.jetpackcomposechatapp.ui.theme.colorBlack
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamily
 
 @Composable
 fun HeadLineLargeComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily
 ) {
     Text(
@@ -31,7 +32,7 @@ fun HeadLineLargeComponent(
 fun HeadLineMediumComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily
 ) {
     Text(
@@ -48,7 +49,7 @@ fun HeadLineMediumComponent(
 fun HeadLineSmallComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily
 ) {
     Text(
@@ -65,7 +66,7 @@ fun HeadLineSmallComponent(
 fun BodyLargeComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily
 ) {
     Text(
@@ -82,7 +83,7 @@ fun BodyLargeComponent(
 fun BodyMediumComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily
 ) {
     Text(
@@ -99,7 +100,7 @@ fun BodyMediumComponent(
 fun BodySmallComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily,
     onClick: () -> Unit
 ) {
@@ -118,7 +119,7 @@ fun BodySmallComponent(
 fun LabelLargeComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily
 ) {
     Text(
@@ -135,7 +136,7 @@ fun LabelLargeComponent(
 fun LabelMediumComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily
 ) {
     Text(
@@ -152,7 +153,7 @@ fun LabelMediumComponent(
 fun LabelSmallComponent(
     textValue: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
+    color: Color = colorBlack,
     fontFamily: FontFamily = interFontFamily
 ) {
     Text(

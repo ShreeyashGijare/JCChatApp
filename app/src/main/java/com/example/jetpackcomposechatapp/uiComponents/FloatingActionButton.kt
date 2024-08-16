@@ -10,6 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import com.example.jetpackcomposechatapp.ui.theme.colorBlue
+import com.example.jetpackcomposechatapp.ui.theme.colorPink
+import com.example.jetpackcomposechatapp.ui.theme.colorWhite
 
 @Composable
 fun ExtendedFloatingButtonComponent(
@@ -18,6 +21,8 @@ fun ExtendedFloatingButtonComponent(
     onClick: () -> Unit
 ) {
     ExtendedFloatingActionButton(
+        containerColor = colorBlue,
+        contentColor = colorWhite,
         onClick = {
             onClick()
         },
@@ -33,6 +38,8 @@ fun FloatingActionButtonComponent(
     onClick: () -> Unit
 ) {
     FloatingActionButton(
+        containerColor = colorBlue,
+        contentColor = colorWhite,
         modifier = Modifier.clip(CircleShape),
         onClick = { onClick() }
     ) {

@@ -19,13 +19,4 @@ fun ProfileScreen(
     navController: NavController
 ) {
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp)),
-        color = MaterialTheme.colorScheme.primary
-    ) {
-
-    }
-
 }

@@ -67,6 +67,10 @@ import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatEvents
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatViewModel
+import com.example.jetpackcomposechatapp.ui.theme.colorBlack
+import com.example.jetpackcomposechatapp.ui.theme.colorBlue
+import com.example.jetpackcomposechatapp.ui.theme.colorPink
+import com.example.jetpackcomposechatapp.ui.theme.colorWhite
 import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -139,7 +143,7 @@ fun ChatScreen(
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(5.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                                    .background(MaterialTheme.colorScheme.secondaryContainer)
                                     .padding(vertical = 5.dp, horizontal = 8.dp),
                             )
                         }
@@ -214,10 +218,10 @@ fun MessageItem(message: ChatState) {
     ) {
         Card(
             colors = CardColors(
-                containerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
-                contentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primaryContainer,
-                disabledContainerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
-                disabledContentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+                containerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) colorPink else colorWhite,
+                contentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) colorWhite else colorBlack,
+                disabledContainerColor = Color.Transparent,
+                disabledContentColor = Color.Transparent,
             ),
             modifier = Modifier
                 .widthIn(20.dp, 300.dp)

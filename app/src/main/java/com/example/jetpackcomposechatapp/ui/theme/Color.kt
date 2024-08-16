@@ -65,5 +65,8 @@ val md_theme_dark_outlineVariant = Color(0xFF4B454D)
 val md_theme_dark_scrim = Color(0xFF000000)
 
 
-val seed = Color(0xFFD0A2F7)
+val colorGray = Color(0xFF808CA9)
 val colorBlack = Color(0xFF000000)
+val colorWhite = Color(0xFFFFFFFF)
+val colorPink = Color(0xFFFFB0FE)
+val colorBlue = Color(0xFF437EFF)

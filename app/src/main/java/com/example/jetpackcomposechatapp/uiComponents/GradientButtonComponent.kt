@@ -23,6 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposechatapp.R
+import com.example.jetpackcomposechatapp.ui.theme.colorBlue
+import com.example.jetpackcomposechatapp.ui.theme.colorPink
+import com.example.jetpackcomposechatapp.ui.theme.colorWhite
 import com.example.jetpackcomposechatapp.ui.theme.shapes
 
 @Composable
@@ -48,12 +51,7 @@ fun GradientButtonComponent(
                 .fillMaxWidth()
                 .heightIn(48.dp)
                 .background(
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    ),
+                    color = colorPink,
                     shape = RoundedCornerShape(50.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -62,7 +60,7 @@ fun GradientButtonComponent(
             Text(
                 text = stringResource(id = R.string.sign_up),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = colorWhite
             )
 
 

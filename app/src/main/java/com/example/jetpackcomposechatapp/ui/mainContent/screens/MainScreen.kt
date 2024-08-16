@@ -29,10 +29,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jetpackcomposechatapp.R
-import com.example.jetpackcomposechatapp.navigation.BottomNavigationBar
 import com.example.jetpackcomposechatapp.navigation.graphs.HomeNavGraph
 import com.example.jetpackcomposechatapp.uiComponents.ExtendedFloatingButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.FloatingActionButtonComponent
+import com.example.jetpackcomposechatapp.uiComponents.JumpingBottomBar
 import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
 import com.example.jetpackcomposechatapp.utils.bottomNavigationItemList
 import kotlinx.coroutines.launch
@@ -58,40 +58,10 @@ fun MainScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-
-
     Scaffold(
         bottomBar = {
-            /*AnimatedVisibility(
-                visible = bottomAppBarVisible,
-                enter = slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = tween(durationMillis = 500)
-                ) + fadeIn(),
-                exit = slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = tween(durationMillis = 500)
-                ) + fadeOut()
-            ) {
-                BottomNavigationBar(
-                    items = bottomNavigationItemList,
-                    currentRoute = currentRoute
-                ) { currentNavigationItem ->
-                    homeNavController.navigate(currentNavigationItem.route) {
-                        homeNavController.graph.startDestinationRoute?.let { startDestinationRoute ->
-                            popUpTo(startDestinationRoute) {
-                                saveState = true
-                            }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            }*/
-
-
             if (bottomAppBarVisible)
-                BottomNavigationBar(
+                /*BottomNavigationBar(
                     items = bottomNavigationItemList,
                     currentRoute = currentRoute
                 ) { currentNavigationItem ->
@@ -104,6 +74,24 @@ fun MainScreen(
                         launchSingleTop = true
                         restoreState = true
                     }
+                }*/
+
+                bottomNavigationItemList.find { it.route == currentRoute }?.let {
+                    JumpingBottomBar(
+                        items = bottomNavigationItemList,
+                        selected = it,
+                        onJump = { currentNavigationItem ->
+                            homeNavController.navigate(currentNavigationItem.route) {
+                                homeNavController.graph.startDestinationRoute?.let { startDestinationRoute ->
+                                    popUpTo(startDestinationRoute) {
+                                        saveState = true
+                                    }
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
                 }
 
             if (!currentRoute.isNullOrEmpty()) {

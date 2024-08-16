@@ -1,6 +1,8 @@
 package com.example.jetpackcomposechatapp.ui.mainContent.screens
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,15 +11,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,9 +37,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -41,7 +53,17 @@ import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chatlist.ChatUserObject
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatListViewModel
+import com.example.jetpackcomposechatapp.ui.theme.colorBlack
+import com.example.jetpackcomposechatapp.ui.theme.colorBlue
+import com.example.jetpackcomposechatapp.ui.theme.colorGray
+import com.example.jetpackcomposechatapp.ui.theme.colorPink
+import com.example.jetpackcomposechatapp.ui.theme.colorWhite
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyBold
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyExtraBold
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
+import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
+import com.example.jetpackcomposechatapp.uiComponents.BodyMediumComponent
+import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
@@ -57,7 +79,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.BreakIterator
 import java.text.StringCharacterIterator
+import java.time.LocalTime
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChatListScreen(
     navController: NavController,
@@ -120,6 +144,7 @@ fun ChatListScreen(
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TopBar(
     onClick: () -> Unit
@@ -127,20 +152,84 @@ fun TopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(colorWhite)
             .padding(vertical = 10.dp, horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HeadLineLargeComponent(
-            modifier = Modifier.clickable {
-                onClick()
-            },
-            textValue = stringResource(id = R.string.app_name),
-            color = MaterialTheme.colorScheme.onBackground,
-            fontFamily = interFontFamilyExtraBold
-        )
-    }
 
+        val user = UserData()
+
+        Image(
+            painter = if (!user.imageUrl.isNullOrEmpty()) rememberImagePainter(data = user.imageUrl) else painterResource(
+                id = R.drawable.ic_profile
+            ), contentDescription = "",
+            modifier = Modifier
+                .size(45.dp)
+                .clip(
+                    CircleShape
+                )
+            /*.border(
+                BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer),
+                RoundedCornerShape(50)
+            )*/
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Column {
+            BodySmallComponent(
+                textValue = greetUserBasedOnTime(),
+                color = colorGray,
+                fontFamily = interFontFamilySemiBold
+            ) {
+                onClick.invoke()
+            }
+
+            Text(
+                modifier = Modifier.width(180.dp),
+                text = "Shreeyash Gijare Shreeyash Gijare",
+                fontFamily = interFontFamilyBold,
+                style = MaterialTheme.typography.bodyLarge,
+                color = colorBlack,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(
+            onClick = {
+
+            },
+            colors = IconButtonColors(
+                containerColor = colorPink,
+                contentColor = colorWhite,
+                disabledContentColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            )
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_search),
+                contentDescription = "Search"
+            )
+        }
+        Spacer(modifier = Modifier.width(10.dp))
+        IconButton(
+            onClick = {
+
+            },
+            colors = IconButtonColors(
+                containerColor = colorBlue,
+                contentColor = colorWhite,
+                disabledContentColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            )
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_add),
+                contentDescription = "Add"
+            )
+        }
+    }
 }
 
 @Composable
@@ -229,5 +318,18 @@ fun LetterByLetterAnimatedText() {
             nextIndex = breakIterator.next()
             delay(typingDelayInMs)
         }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun greetUserBasedOnTime(): String {
+    val currentTime = LocalTime.now()
+
+    return when (currentTime.hour) {
+        in 5..11 -> "Good Morning"
+        in 12..17 -> "Good Afternoon"
+        in 18..21 -> "Good Evening"
+        else -> "Good Night"
     }
 }

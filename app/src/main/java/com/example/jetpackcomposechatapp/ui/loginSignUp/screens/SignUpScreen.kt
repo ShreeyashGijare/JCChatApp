@@ -1,11 +1,13 @@
 package com.example.jetpackcomposechatapp.ui.loginSignUp.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -123,6 +126,15 @@ fun SignUpScreen(
             errorMessage = signUpState.passwordErrorMessage
         )
         Spacer(modifier = Modifier.heightIn(30.dp))
+
+        Image(
+            imageVector = Icons.Default.AccountCircle, contentDescription = "null",
+            modifier = Modifier.size(80.dp)
+                .clickable {
+
+                }
+        )
+
         GradientButtonComponent(
             buttonText = R.string.sign_up,
             modifier = Modifier.padding(horizontal = 40.dp)
