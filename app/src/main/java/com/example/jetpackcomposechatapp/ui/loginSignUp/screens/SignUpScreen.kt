@@ -126,15 +126,6 @@ fun SignUpScreen(
             errorMessage = signUpState.passwordErrorMessage
         )
         Spacer(modifier = Modifier.heightIn(30.dp))
-
-        Image(
-            imageVector = Icons.Default.AccountCircle, contentDescription = "null",
-            modifier = Modifier.size(80.dp)
-                .clickable {
-
-                }
-        )
-
         GradientButtonComponent(
             buttonText = R.string.sign_up,
             modifier = Modifier.padding(horizontal = 40.dp)
