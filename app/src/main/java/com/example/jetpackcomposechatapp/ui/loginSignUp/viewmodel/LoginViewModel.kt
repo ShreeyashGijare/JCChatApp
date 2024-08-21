@@ -1,5 +1,6 @@
 package com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -65,13 +66,14 @@ class LoginViewModel @Inject constructor(
         inProgress.value = true
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful) {
+                Log.i("LoginNJNN", "Success")
+
                 inProgress.value = false
                 auth.currentUser?.uid?.let { userId ->
                     getUserData(userId)
                 }
             } else {
-
-
+                Log.i("LoginNJNN", it.exception.toString())
             }
         }
     }

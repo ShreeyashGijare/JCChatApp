@@ -1,6 +1,7 @@
 package com.example.jetpackcomposechatapp.ui.mainContent.screens
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
@@ -103,9 +106,9 @@ fun ChatListScreen(
         }
     }
 
-
     Column {
         TopBar(
+            viewModel = viewModel,
             onClick = {
                 coroutineScope.launch {
                     if (signOutUser()) {
@@ -147,8 +150,12 @@ fun ChatListScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TopBar(
+    viewModel: ChatListViewModel,
     onClick: () -> Unit
 ) {
+
+    val currentUserData by viewModel.currentUser.collectAsState()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -157,21 +164,16 @@ fun TopBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        val user = UserData()
-
         Image(
-            painter = if (!user.imageUrl.isNullOrEmpty()) rememberImagePainter(data = user.imageUrl) else painterResource(
+            painter = if (!currentUserData.imageUrl.isNullOrBlank()) rememberImagePainter(data = currentUserData.imageUrl)  else painterResource(
                 id = R.drawable.ic_profile
             ), contentDescription = "",
             modifier = Modifier
                 .size(45.dp)
                 .clip(
                     CircleShape
-                )
-            /*.border(
-                BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer),
-                RoundedCornerShape(50)
-            )*/
+                ),
+            contentScale = ContentScale.FillBounds
         )
         Spacer(modifier = Modifier.width(10.dp))
         Column {
@@ -185,11 +187,11 @@ fun TopBar(
 
             Text(
                 modifier = Modifier.width(180.dp),
-                text = "Shreeyash Gijare Shreeyash Gijare",
+                text = currentUserData.name.toString(),
                 fontFamily = interFontFamilyBold,
                 style = MaterialTheme.typography.bodyLarge,
                 color = colorBlack,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Start,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -237,6 +239,7 @@ fun UserChatItem(
     user: ChatUserObject,
     onClick: (UserData) -> Unit
 ) {
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -255,18 +258,16 @@ fun UserChatItem(
 
     ) {
         Image(
-            painter = if (!user.imageUrl.isNullOrEmpty()) rememberImagePainter(data = user.imageUrl) else painterResource(
-                id = R.drawable.chat_icon_one
+            painter = if (!user.imageUrl.isNullOrBlank()) rememberAsyncImagePainter(model = user.imageUrl) else painterResource(
+                id = R.drawable.ic_profile
             ), contentDescription = "",
             modifier = Modifier
                 .size(45.dp)
                 .clip(
                     CircleShape
                 )
-                .border(
-                    BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer),
-                    RoundedCornerShape(50)
-                )
+            ,
+            contentScale = ContentScale.FillBounds
         )
         Column(
             modifier = Modifier.padding(start = 15.dp)

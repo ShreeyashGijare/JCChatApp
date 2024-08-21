@@ -94,7 +94,6 @@ class ContactsViewModel @Inject constructor(
                         _availableUsersToChat.value =
                             availableUserList.filter { it.number in mergedListAvailableUsersAndContacts }
                                 .toMutableList()
-                        Log.i("uidbfbfibudsf", _availableUsersToChat.toString())
                     }
 
                 }

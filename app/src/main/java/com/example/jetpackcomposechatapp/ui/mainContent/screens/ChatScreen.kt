@@ -103,7 +103,6 @@ fun ChatScreen(
         viewModel.getUserChats()
     }
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -185,20 +184,16 @@ fun ChatScreenTopBar(
                     onBackArrowClick()
                 }
         )
-//        Spacer(modifier = Modifier.width(5.dp))
         Image(
-            painter = if (!userData.imageUrl.isNullOrEmpty()) rememberImagePainter(data = userData.imageUrl) else painterResource(
-                id = R.drawable.chat_icon_one
+            painter = if (!userData.imageUrl.isNullOrBlank()) rememberImagePainter(data = userData.imageUrl) else painterResource(
+                id = R.drawable.ic_profile
             ), contentDescription = "",
             modifier = Modifier
                 .size(45.dp)
                 .clip(
                     CircleShape
-                )
-                .border(
-                    BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer),
-                    RoundedCornerShape(50)
-                )
+                ),
+            contentScale = ContentScale.FillBounds
         )
         Spacer(modifier = Modifier.width(10.dp))
         BodyLargeComponent(

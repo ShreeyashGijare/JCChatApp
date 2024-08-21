@@ -103,7 +103,6 @@ fun ContactsScreen(
             contentPadding = PaddingValues(15.dp)
         ) {
             items(availableContacts/*.sortedBy { it.name }*/) { user ->
-                Log.i("uidbfbfibudsf_sdsadsa___", user.name!!)
                 AvailableUsersItem(user = user) { userData ->
                     homeNavController.navigate(
                         "${HomeRouteScreen.ChatScreen.route}?userData=${

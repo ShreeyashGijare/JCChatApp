@@ -55,7 +55,6 @@ class ChatViewModel @Inject constructor(
                 if (value != null) {
                     val user = value.toObject<UserData>()
                     currentUser = user
-                    Log.i("CURRENT_USER", currentUser.toString())
                 }
             }
         }
@@ -107,20 +106,46 @@ class ChatViewModel @Inject constructor(
             receiverId = receiverUser?.userId!!
         )
 
-        db.collection(CHAT_LIST_NODE).document(auth.currentUser?.uid!!)
+
+        //check receiver user exists in sender chat list and update
+        /*db.collection(CHAT_LIST_NODE).document(auth.currentUser?.uid!!)
             .collection(CHAT_LIST_USER_NODE)
             .document(receiverUser?.userId!!)
-            .set(receiverUserListObject)
+            .set(receiverUserListObject)*/
+        val receiverUserObjectRef = db.collection(CHAT_LIST_NODE).document(auth.currentUser?.uid!!)
+            .collection(CHAT_LIST_USER_NODE)
+            .document(receiverUser?.userId!!)
 
-        db.collection(CHAT_LIST_NODE).document(receiverUser?.userId!!)
+        receiverUserObjectRef.get().addOnSuccessListener {
+            if (!it.exists()) {
+                receiverUserObjectRef.set(receiverUserListObject)
+            } else {
+                Log.i("ChatMessage-receiver", " -->  Exists")
+            }
+        }
+
+        //check sender user exists in receiver chat list and update
+        /*db.collection(CHAT_LIST_NODE).document(receiverUser?.userId!!)
             .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
-            .set(currentUserListObject)
+            .set(currentUserListObject)*/
+        val senderUserObjectRef = db.collection(CHAT_LIST_NODE).document(receiverUser?.userId!!)
+            .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
 
+        senderUserObjectRef.get().addOnSuccessListener {
+            if (!it.exists()) {
+                senderUserObjectRef.set(currentUserListObject)
+            } else {
+                Log.i("ChatMessage-sender", " -->  Exists")
+            }
+        }
+
+        //Add Message to chatRoom
         db.collection(CHAT_MESSAGES)
             .document(generateChatId(auth.currentUser?.uid!!, receiverUser?.userId!!))
             .collection(MESSAGES)
             .add(_chatState.value)
     }
+
     private fun generateChatId(senderId: String, receiverId: String): String {
         return if (senderId < receiverId) "$senderId-$receiverId" else "$receiverId-$senderId"
     }
