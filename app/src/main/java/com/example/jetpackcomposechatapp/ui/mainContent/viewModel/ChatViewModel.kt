@@ -65,7 +65,7 @@ class ChatViewModel @Inject constructor(
             db.collection(CHAT_MESSAGES)
                 .document(generateChatId(auth.currentUser?.uid!!, receiverUser?.userId!!))
                 .collection(MESSAGES)
-                .orderBy("timeStamp", Query.Direction.DESCENDING)
+                .orderBy("timeStamp", Query.Direction.ASCENDING)
                 .addSnapshotListener { snapShot, e ->
                     if (e != null) {
                         Log.i("ChatRepository", "Listen failed.", e)

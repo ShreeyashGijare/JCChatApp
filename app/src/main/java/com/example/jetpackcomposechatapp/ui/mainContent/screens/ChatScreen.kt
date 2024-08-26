@@ -80,6 +80,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -89,11 +90,8 @@ fun ChatScreen(
     homeNavController: NavController,
     userData: UserData,
     viewModel: ChatViewModel = hiltViewModel()
-
 ) {
-
     val chatMessages by viewModel.chatMessages.collectAsState()
-    var previousDate: LocalDate? = null
 
     LaunchedEffect(key1 = Unit) {
         viewModel.setReceiverUser(userData)
@@ -122,23 +120,15 @@ fun ChatScreen(
                 .weight(1f),
             contentPadding = PaddingValues(15.dp)
         ) {
-
-            items(chatMessages) { message ->
-                Column {
-                    val messageDate =
-                        LocalDateTime.ofInstant(
-                            Instant.ofEpochMilli(message.timeStamp),
-                            ZoneId.systemDefault()
-                        )
-                            .toLocalDate()
-                    if (messageDate != previousDate) {
-                        previousDate = messageDate
+            items(groupMessagesByDay(chatMessages).reversed()) { dayMessage ->
+                when (dayMessage) {
+                    is DayMessage.Header -> {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = getFormattedDateLabel(message.timeStamp),
+                                text = dayMessage.date,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(5.dp))
@@ -146,14 +136,15 @@ fun ChatScreen(
                                     .padding(vertical = 5.dp, horizontal = 8.dp),
                             )
                         }
-                    } else {
-                        previousDate = messageDate
                     }
-                    MessageItem(message = message)
+
+                    is DayMessage.Item -> {
+                        MessageItem(message = dayMessage.message)
+                    }
                 }
 
-//                MessageItem(message = message)
             }
+
         }
         ChatScreenBottomBar(
             onSendButtonClick = { message ->
@@ -251,7 +242,6 @@ fun MessageItem(message: ChatState) {
 fun ChatScreenBottomBar(
     onSendButtonClick: (String) -> Unit
 ) {
-
     var message by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -332,4 +322,39 @@ fun getFormattedDateLabel(timeInMillis: Long): String {
         today.minusDays(1) -> "Yesterday"
         else -> dateTime.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
     }
+}
+
+fun formatDate(date: Date): String {
+    val calendar = Calendar.getInstance()
+    val today = calendar.time
+
+    calendar.add(Calendar.DATE, -1)
+    val yesterday = calendar.time
+
+    val dayDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val formattedDate = dayDateFormat.format(date)
+
+    return when (formattedDate) {
+        dayDateFormat.format(today) -> "Today"
+        dayDateFormat.format(yesterday) -> "Yesterday"
+        else -> SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(date)
+    }
+}
+
+fun groupMessagesByDay(messages: List<ChatState>): List<DayMessage> {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return messages.groupBy {
+        dateFormat.format(Date(it.timeStamp))
+    }.flatMap { (date, messagesOnDate) ->
+        val dateObject = dateFormat.parse(date)
+        val formattedDate = formatDate(dateObject!!)
+        val dayHeader = DayMessage.Header(formattedDate)
+        val messageItems = messagesOnDate.map { DayMessage.Item(it) }
+        listOf(dayHeader) + messageItems
+    }
+}
+
+sealed class DayMessage {
+    data class Header(val date: String) : DayMessage()
+    data class Item(val message: ChatState) : DayMessage()
 }
