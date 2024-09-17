@@ -12,13 +12,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -69,6 +72,7 @@ import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatViewModel
 import com.example.jetpackcomposechatapp.ui.theme.colorBlack
 import com.example.jetpackcomposechatapp.ui.theme.colorBlue
+import com.example.jetpackcomposechatapp.ui.theme.colorLightGray
 import com.example.jetpackcomposechatapp.ui.theme.colorPink
 import com.example.jetpackcomposechatapp.ui.theme.colorWhite
 import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
@@ -104,7 +108,6 @@ fun ChatScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
     ) {
 
         ChatScreenTopBar(
@@ -117,7 +120,8 @@ fun ChatScreen(
             reverseLayout = true,
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f),
+                .weight(1f)
+                .background(colorLightGray),
             contentPadding = PaddingValues(15.dp)
         ) {
             items(groupMessagesByDay(chatMessages).reversed()) { dayMessage ->
@@ -162,7 +166,7 @@ fun ChatScreenTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(colorWhite)
             .padding(vertical = 10.dp, horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -248,7 +252,7 @@ fun ChatScreenBottomBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(colorWhite)
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically

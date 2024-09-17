@@ -1,12 +1,16 @@
 package com.example.jetpackcomposechatapp.data.userData
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class UserData(
     val imageUrl: String? = "",
     val name: String? = "",
     val number: String? = "",
     val userId: String? = "",
     val emailId: String? = ""
-) {
+) : Parcelable {
 
     fun toMap() = mapOf(
         "imageUrl" to imageUrl,
