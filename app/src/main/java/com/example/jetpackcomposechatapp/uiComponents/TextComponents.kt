@@ -137,14 +137,15 @@ fun LabelMediumComponent(
     textValue: String,
     modifier: Modifier = Modifier,
     color: Color = colorBlack,
-    fontFamily: FontFamily = interFontFamily
+    fontFamily: FontFamily = interFontFamily,
+    textAlign: TextAlign = TextAlign.Center
 ) {
     Text(
         text = textValue,
         style = MaterialTheme.typography.labelMedium,
         modifier = modifier,
         color = color,
-        textAlign = TextAlign.Center,
+        textAlign = textAlign,
         fontFamily = fontFamily
     )
 }
@@ -154,14 +155,15 @@ fun LabelSmallComponent(
     textValue: String,
     modifier: Modifier = Modifier,
     color: Color = colorBlack,
-    fontFamily: FontFamily = interFontFamily
+    fontFamily: FontFamily = interFontFamily,
+    textAlign: TextAlign = TextAlign.Center
 ) {
     Text(
         text = textValue,
         style = MaterialTheme.typography.labelSmall,
         modifier = modifier,
         color = color,
-        textAlign = TextAlign.Center,
+        textAlign = textAlign,
         fontFamily = fontFamily
     )
 }

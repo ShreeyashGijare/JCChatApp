@@ -7,6 +7,8 @@ object Graph {
 }
 
 sealed class AuthRouteScreen(val route: String) {
+
+    object OnBoardScreen : AuthRouteScreen("OnBoard")
     object SignUpScreen : AuthRouteScreen("SignUp")
     object LoginScreen : AuthRouteScreen("Login")
 

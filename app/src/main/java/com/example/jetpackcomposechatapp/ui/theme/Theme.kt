@@ -1,6 +1,7 @@
 package com.example.jetpackcomposechatapp.ui.theme
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -82,7 +83,8 @@ private val DarkColorsMaterial = darkColorScheme(
 private val LightColors = lightColorScheme(
     primary = colorPink,
     secondary = colorBlue,
-    tertiary = colorWhite
+    tertiary = colorWhite,
+    error = colorRed
 )
 
 @Composable
@@ -105,7 +107,7 @@ fun JetPackComposeChatAppTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorWhite.toArgb()
+            window.statusBarColor = Color.TRANSPARENT
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }
@@ -113,7 +115,7 @@ fun JetPackComposeChatAppTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        shapes =  shapes,
+        shapes = shapes,
         content = content
     )
 }

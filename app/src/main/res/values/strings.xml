@@ -6,7 +6,9 @@
     <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
     <string name="already_have_account">Already have an account!! Click her to Login</string>
-    <string name="create_account">Don\'t have an account!! Click here to Sign Up</string>
+    <string name="create_account">Create account</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
 
     <string name="user_name_error">Please enter a valid Username!!!</string>
     <string name="email_error">Please enter a valid Email!!!</string>
@@ -24,5 +26,6 @@
     <string name="total_contacts">Showing %1$s contacts</string>
     <string name="type_a_message">Type a message</string>
     <string name="attach">Attach</string>
+    <string name="continue_text">Continue</string>
 
 </resources>

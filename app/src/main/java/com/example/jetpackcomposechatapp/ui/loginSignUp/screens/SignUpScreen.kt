@@ -1,22 +1,20 @@
 package com.example.jetpackcomposechatapp.ui.loginSignUp.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,9 +31,10 @@ import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpEvents
 import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.SignUpViewModel
+import com.example.jetpackcomposechatapp.ui.theme.colorBlue
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.CommonProgressBar
-import com.example.jetpackcomposechatapp.uiComponents.GradientButtonComponent
+import com.example.jetpackcomposechatapp.uiComponents.PinkBackgroundButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.OutlinedTextFieldComponent
 import com.example.jetpackcomposechatapp.uiComponents.PasswordTextFieldComponent
@@ -66,11 +65,12 @@ fun SignUpScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .wrapContentHeight()
             .verticalScroll(
                 rememberScrollState()
             )
-            .padding(horizontal = 20.dp),
+            .background(colorBlue)
+            .padding(horizontal = 20.dp)
+            .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
@@ -126,7 +126,7 @@ fun SignUpScreen(
             errorMessage = signUpState.passwordErrorMessage
         )
         Spacer(modifier = Modifier.heightIn(30.dp))
-        GradientButtonComponent(
+        PinkBackgroundButtonComponent(
             buttonText = R.string.sign_up,
             modifier = Modifier.padding(horizontal = 40.dp)
         ) {
