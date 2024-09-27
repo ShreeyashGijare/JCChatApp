@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -97,6 +98,7 @@ fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     val chatMessages by viewModel.chatMessages.collectAsState()
+    val receiverUser by viewModel.receiverUser.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
         viewModel.setReceiverUser(userData)
@@ -109,13 +111,15 @@ fun ChatScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(colorWhite)
+            .statusBarsPadding()
     ) {
 
         ChatScreenTopBar(
             onBackArrowClick = {
                 homeNavController.popBackStack()
             },
-            userData = userData
+            userData = receiverUser
         )
         LazyColumn(
             reverseLayout = true,

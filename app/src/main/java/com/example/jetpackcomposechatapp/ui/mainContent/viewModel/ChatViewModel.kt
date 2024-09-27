@@ -33,13 +33,16 @@ class ChatViewModel @Inject constructor(
     private val _chatState = mutableStateOf(ChatState())
 
     var currentUser: UserData? = null
-    private var receiverUser: UserData? = null
+
+    private var _receiverUser: MutableStateFlow<UserData> = MutableStateFlow(UserData())
+    val receiverUser: StateFlow<UserData> get() = _receiverUser
 
     private val _chatMessages = MutableStateFlow<List<ChatState>>(emptyList())
     val chatMessages: StateFlow<List<ChatState>> = _chatMessages
 
     fun setReceiverUser(receiverUser: UserData) {
-        this.receiverUser = receiverUser
+        this._receiverUser.value = receiverUser
+        getReceiverUserData(receiverUser.userId!!)
     }
 
     init {
@@ -60,10 +63,24 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    private fun getReceiverUserData(uid: String) {
+        viewModelScope.launch {
+            db.collection(Constants.USER_NODE).document(uid).addSnapshotListener { value, error ->
+                if (error != null) {
+                    Log.e("ERROR_CHAT", error.message.toString())
+                }
+                if (value != null) {
+                    val user = value.toObject<UserData>()
+                    _receiverUser.value = user!!
+                }
+            }
+        }
+    }
+
     fun getUserChats() {
         viewModelScope.launch {
             db.collection(CHAT_MESSAGES)
-                .document(generateChatId(auth.currentUser?.uid!!, receiverUser?.userId!!))
+                .document(generateChatId(auth.currentUser?.uid!!, _receiverUser.value.userId!!))
                 .collection(MESSAGES)
                 .orderBy("timeStamp", Query.Direction.ASCENDING)
                 .addSnapshotListener { snapShot, e ->
@@ -92,18 +109,18 @@ class ChatViewModel @Inject constructor(
         )
 
         val receiverUserListObject = ChatUserObject(
-            imageUrl = receiverUser?.imageUrl,
-            name = receiverUser?.name,
-            number = receiverUser?.number,
-            emailId = receiverUser?.emailId,
-            userId = receiverUser?.userId
+            imageUrl = _receiverUser.value.imageUrl,
+            name = _receiverUser.value.name,
+            number = _receiverUser.value.number,
+            emailId = _receiverUser.value.emailId,
+            userId = _receiverUser.value.userId
         )
 
         _chatState.value = _chatState.value.copy(
             message = message,
             timeStamp = Calendar.getInstance().timeInMillis,
             senderId = auth.currentUser?.uid!!,
-            receiverId = receiverUser?.userId!!
+            receiverId = _receiverUser.value.userId!!
         )
 
 
@@ -114,7 +131,7 @@ class ChatViewModel @Inject constructor(
             .set(receiverUserListObject)*/
         val receiverUserObjectRef = db.collection(CHAT_LIST_NODE).document(auth.currentUser?.uid!!)
             .collection(CHAT_LIST_USER_NODE)
-            .document(receiverUser?.userId!!)
+            .document(_receiverUser.value.userId!!)
 
         receiverUserObjectRef.get().addOnSuccessListener {
             if (!it.exists()) {
@@ -128,7 +145,7 @@ class ChatViewModel @Inject constructor(
         /*db.collection(CHAT_LIST_NODE).document(receiverUser?.userId!!)
             .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
             .set(currentUserListObject)*/
-        val senderUserObjectRef = db.collection(CHAT_LIST_NODE).document(receiverUser?.userId!!)
+        val senderUserObjectRef = db.collection(CHAT_LIST_NODE).document(_receiverUser.value.userId!!)
             .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
 
         senderUserObjectRef.get().addOnSuccessListener {
@@ -141,7 +158,7 @@ class ChatViewModel @Inject constructor(
 
         //Add Message to chatRoom
         db.collection(CHAT_MESSAGES)
-            .document(generateChatId(auth.currentUser?.uid!!, receiverUser?.userId!!))
+            .document(generateChatId(auth.currentUser?.uid!!, _receiverUser.value.userId!!))
             .collection(MESSAGES)
             .add(_chatState.value)
     }

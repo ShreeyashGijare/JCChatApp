@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -106,7 +107,12 @@ fun ChatListScreen(
         }
     }
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorWhite)
+            .statusBarsPadding()
+    ) {
         TopBar(
             viewModel = viewModel,
             onClick = {
@@ -165,7 +171,7 @@ fun TopBar(
     ) {
 
         Image(
-            painter = if (!currentUserData.imageUrl.isNullOrBlank()) rememberImagePainter(data = currentUserData.imageUrl)  else painterResource(
+            painter = if (!currentUserData.imageUrl.isNullOrBlank()) rememberImagePainter(data = currentUserData.imageUrl) else painterResource(
                 id = R.drawable.ic_profile
             ), contentDescription = "",
             modifier = Modifier
@@ -265,8 +271,7 @@ fun UserChatItem(
                 .size(45.dp)
                 .clip(
                     CircleShape
-                )
-            ,
+                ),
             contentScale = ContentScale.FillBounds
         )
         Column(

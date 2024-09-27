@@ -76,7 +76,7 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.chat_icon_one),
+            painter = painterResource(id = R.drawable.cirqle_icon),
             contentDescription = null,
             modifier = Modifier
                 .width(200.dp)

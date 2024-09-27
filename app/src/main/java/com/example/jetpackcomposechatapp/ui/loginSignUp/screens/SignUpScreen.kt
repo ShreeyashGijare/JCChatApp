@@ -1,7 +1,13 @@
 package com.example.jetpackcomposechatapp.ui.loginSignUp.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,6 +41,9 @@ import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpEvents
 import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.SignUpViewModel
 import com.example.jetpackcomposechatapp.ui.theme.colorBlue
+import com.example.jetpackcomposechatapp.ui.theme.colorGray
+import com.example.jetpackcomposechatapp.ui.theme.colorLightGray
+import com.example.jetpackcomposechatapp.ui.theme.colorPink
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.CommonProgressBar
 import com.example.jetpackcomposechatapp.uiComponents.PinkBackgroundButtonComponent
@@ -40,6 +52,7 @@ import com.example.jetpackcomposechatapp.uiComponents.OutlinedTextFieldComponent
 import com.example.jetpackcomposechatapp.uiComponents.PasswordTextFieldComponent
 import com.example.jetpackcomposechatapp.utils.AuthRouteScreen
 import com.example.jetpackcomposechatapp.utils.Graph
+import kotlinx.coroutines.delay
 
 @Composable
 fun SignUpScreen(
@@ -47,7 +60,38 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
 
-    val signUpState by viewModel.signUpState
+    var showSecondScreen by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = Unit, block = {
+        delay(3000L)
+        showSecondScreen = true
+        delay(3000L)
+        showSecondScreen = false
+    })
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+
+        FirstNameScreen()
+        /*if (showSecondScreen) {
+            SecondScreen()
+        }*/
+
+        AnimatedVisibility(
+            visible = showSecondScreen,
+            enter = fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = fadeOut() + slideOutHorizontally(targetOffsetX = { -it })
+        ) {
+            SecondScreen()
+        }
+
+    }
+
+    /*val signUpState by viewModel.signUpState
     val signUpSuccess by viewModel.signInSuccess.collectAsState()
 
     LaunchedEffect(key1 = signUpSuccess) {
@@ -141,5 +185,35 @@ fun SignUpScreen(
     }
     if (viewModel.inProgress.value) {
         CommonProgressBar()
+    }*/
+}
+
+@Composable
+fun FirstNameScreen() {
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorPink)
+            .statusBarsPadding()
+    ) {
+
     }
+
+}
+
+@Composable
+fun SecondScreen() {
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorGray)
+            .statusBarsPadding()
+    ) {
+
+    }
+
 }
