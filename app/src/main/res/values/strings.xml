@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Cirqle</string>
 
-
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
@@ -27,5 +26,10 @@
     <string name="type_a_message">Type a message</string>
     <string name="attach">Attach</string>
     <string name="continue_text">Continue</string>
+    <string name="what_should_you_be_called">First things first, what you wish to be called?</string>
+    <string name="app_slogan">Connect. Chat.\nComplete the Circle</string>
+    <string name="enter_mobile_text">To connect, please share your mobile number!</string>
+    <string name="enter_email">Enter your Email</string>
+    <string name="enter_password">Enter your Password</string>
 
 </resources>

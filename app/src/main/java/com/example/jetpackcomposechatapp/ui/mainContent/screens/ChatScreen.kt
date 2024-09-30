@@ -2,27 +2,22 @@ package com.example.jetpackcomposechatapp.ui.mainContent.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -30,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Send
@@ -43,7 +37,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,22 +55,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
-import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatEvents
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatViewModel
-import com.example.jetpackcomposechatapp.ui.theme.colorBlack
-import com.example.jetpackcomposechatapp.ui.theme.colorBlue
-import com.example.jetpackcomposechatapp.ui.theme.colorLightGray
-import com.example.jetpackcomposechatapp.ui.theme.colorPink
-import com.example.jetpackcomposechatapp.ui.theme.colorWhite
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
 import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
+import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
@@ -111,7 +99,7 @@ fun ChatScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorWhite)
+            .background(MaterialTheme.colorScheme.onPrimary)
             .statusBarsPadding()
     ) {
 
@@ -126,7 +114,7 @@ fun ChatScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
-                .background(colorLightGray),
+                .background(MaterialTheme.colorScheme.background),
             contentPadding = PaddingValues(15.dp)
         ) {
             items(groupMessagesByDay(chatMessages).reversed()) { dayMessage ->
@@ -136,13 +124,13 @@ fun ChatScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Text(
-                                text = dayMessage.date,
-                                style = MaterialTheme.typography.bodySmall,
+                            LabelSmallComponent(
+                                textValue = dayMessage.date,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(5.dp))
-                                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                                    .background(MaterialTheme.colorScheme.onPrimary)
                                     .padding(vertical = 5.dp, horizontal = 8.dp),
+                                fontFamily = interFontFamilySemiBold
                             )
                         }
                     }
@@ -151,9 +139,7 @@ fun ChatScreen(
                         MessageItem(message = dayMessage.message)
                     }
                 }
-
             }
-
         }
         ChatScreenBottomBar(
             onSendButtonClick = { message ->
@@ -171,13 +157,14 @@ fun ChatScreenTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colorWhite)
+            .background(MaterialTheme.colorScheme.onBackground)
             .padding(vertical = 10.dp, horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
             contentDescription = stringResource(R.string.back_arrow),
+            tint = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
                 .weight(.2f)
                 .clickable {
@@ -213,8 +200,8 @@ fun MessageItem(message: ChatState) {
     ) {
         Card(
             colors = CardColors(
-                containerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) colorPink else colorWhite,
-                contentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) colorWhite else colorBlack,
+                containerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onPrimary,
+                contentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onBackground,
                 disabledContainerColor = Color.Transparent,
                 disabledContentColor = Color.Transparent,
             ),
@@ -257,7 +244,7 @@ fun ChatScreenBottomBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colorWhite)
+            .background(MaterialTheme.colorScheme.onBackground)
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically

@@ -1,13 +1,10 @@
 package com.example.jetpackcomposechatapp.ui.mainContent.screens
 
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
@@ -40,11 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -57,18 +51,9 @@ import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chatlist.ChatUserObject
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatListViewModel
-import com.example.jetpackcomposechatapp.ui.theme.colorBlack
-import com.example.jetpackcomposechatapp.ui.theme.colorBlue
-import com.example.jetpackcomposechatapp.ui.theme.colorGray
-import com.example.jetpackcomposechatapp.ui.theme.colorPink
-import com.example.jetpackcomposechatapp.ui.theme.colorWhite
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyBold
-import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyExtraBold
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
-import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
-import com.example.jetpackcomposechatapp.uiComponents.BodyMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
-import com.example.jetpackcomposechatapp.uiComponents.HeadLineLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
 import com.example.jetpackcomposechatapp.utils.Graph
@@ -110,7 +95,7 @@ fun ChatListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorWhite)
+            .background(MaterialTheme.colorScheme.onPrimary)
             .statusBarsPadding()
     ) {
         TopBar(
@@ -132,7 +117,8 @@ fun ChatListScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f),
+                .weight(1f)
+                .background(MaterialTheme.colorScheme.background),
             contentPadding = PaddingValues(15.dp)
         ) {
 
@@ -165,7 +151,7 @@ fun TopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colorWhite)
+            .background(MaterialTheme.colorScheme.onPrimary)
             .padding(vertical = 10.dp, horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -185,7 +171,7 @@ fun TopBar(
         Column {
             BodySmallComponent(
                 textValue = greetUserBasedOnTime(),
-                color = colorGray,
+                color = MaterialTheme.colorScheme.secondaryContainer,
                 fontFamily = interFontFamilySemiBold
             ) {
                 onClick.invoke()
@@ -196,7 +182,7 @@ fun TopBar(
                 text = currentUserData.name.toString(),
                 fontFamily = interFontFamilyBold,
                 style = MaterialTheme.typography.bodyLarge,
-                color = colorBlack,
+                color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Start,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -209,8 +195,8 @@ fun TopBar(
 
             },
             colors = IconButtonColors(
-                containerColor = colorPink,
-                contentColor = colorWhite,
+                containerColor = MaterialTheme.colorScheme.tertiary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 disabledContentColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent
             )
@@ -226,8 +212,8 @@ fun TopBar(
 
             },
             colors = IconButtonColors(
-                containerColor = colorBlue,
-                contentColor = colorWhite,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 disabledContentColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent
             )

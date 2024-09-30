@@ -1,7 +1,5 @@
 package com.example.jetpackcomposechatapp.ui.loginSignUp.screens
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +17,9 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,23 +28,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.lerp
 import androidx.navigation.NavController
 import com.example.jetpackcomposechatapp.R
-import com.example.jetpackcomposechatapp.ui.theme.colorBlue
-import com.example.jetpackcomposechatapp.ui.theme.colorGray
-import com.example.jetpackcomposechatapp.ui.theme.colorLightGray
-import com.example.jetpackcomposechatapp.ui.theme.colorPink
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyBold
-import com.example.jetpackcomposechatapp.uiComponents.BlueBackgroundButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.BlueOutlinedButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.PinkBackgroundButtonComponent
-import com.example.jetpackcomposechatapp.uiComponents.PinkOutlinedButtonComponent
 import com.example.jetpackcomposechatapp.utils.AuthRouteScreen
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
@@ -80,7 +67,7 @@ fun OnBoardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorLightGray)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         HorizontalPager(state = pagerState) { page ->
             Box(
@@ -111,7 +98,7 @@ fun OnBoardScreen(
                     overflow = TextOverflow.Ellipsis,
                     lineHeight = 42.sp,
                     fontFamily = interFontFamilyBold,
-                    color = if (page == 1) colorPink else colorBlue
+                    color = if (page == 1) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -124,7 +111,7 @@ fun OnBoardScreen(
         ) {
             repeat(pageCount) { iteration ->
                 val color =
-                    if (pagerState.currentPage == iteration) if (iteration == 1) colorPink else colorBlue else colorGray
+                    if (pagerState.currentPage == iteration) if (iteration == 1) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
@@ -136,14 +123,14 @@ fun OnBoardScreen(
 
         PinkBackgroundButtonComponent(
             buttonText = R.string.sign_in,
-            modifier = Modifier.padding(horizontal = 40.dp)
+            modifier = Modifier.padding(horizontal = 20.dp)
         ) {
             rootNavController.navigate(AuthRouteScreen.LoginScreen.route)
         }
         Spacer(modifier = Modifier.height(20.dp))
         BlueOutlinedButtonComponent(
             buttonText = R.string.create_account,
-            modifier = Modifier.padding(horizontal = 40.dp)
+            modifier = Modifier.padding(horizontal = 20.dp)
         ) {
             rootNavController.navigate(AuthRouteScreen.SignUpScreen.route)
         }

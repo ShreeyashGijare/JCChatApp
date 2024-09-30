@@ -6,12 +6,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -24,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,10 +34,8 @@ import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.ui.loginSignUp.data.loginData.LoginEvents
 import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.LoginViewModel
 import com.example.jetpackcomposechatapp.uiComponents.BlueBackgroundButtonComponent
-import com.example.jetpackcomposechatapp.uiComponents.BlueOutlinedButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.CommonProgressBar
-import com.example.jetpackcomposechatapp.uiComponents.PinkBackgroundButtonComponent
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.OutlinedTextFieldComponent
@@ -97,14 +95,17 @@ fun LoginScreen(
         )
         Spacer(modifier = Modifier.height(5.dp))
         OutlinedTextFieldComponent(
-            labelValue = "Enter your Email",
+            labelValue = stringResource(R.string.enter_email),
             leadingIcon = Icons.Default.Email,
             onTextSelected = {
                 viewModel.onEvent(LoginEvents.Email(it))
             },
             isError = loginState.emailError,
             errorMessage = loginState.emailErrorMessage,
-            keyboardType = KeyboardType.Email
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Email
+            )
         )
         Spacer(modifier = Modifier.height(10.dp))
         LabelMediumComponent(
@@ -115,11 +116,14 @@ fun LoginScreen(
         )
         Spacer(modifier = Modifier.height(5.dp))
         PasswordTextFieldComponent(
-            labelValue = "Enter your Password", onTextSelected = {
+            labelValue = stringResource(R.string.enter_password), onTextSelected = {
                 viewModel.onEvent(LoginEvents.Password(it))
             },
             isError = loginState.passwordError,
-            errorMessage = loginState.passwordErrorMessage
+            errorMessage = loginState.passwordErrorMessage,
+            onDone = {
+                viewModel.onEvent(LoginEvents.LoginButtonClick)
+            }
         )
         Spacer(modifier = Modifier.height(30.dp))
         BlueBackgroundButtonComponent(
@@ -138,6 +142,4 @@ fun LoginScreen(
     if (viewModel.inProgress.value) {
         CommonProgressBar()
     }
-
-
 }

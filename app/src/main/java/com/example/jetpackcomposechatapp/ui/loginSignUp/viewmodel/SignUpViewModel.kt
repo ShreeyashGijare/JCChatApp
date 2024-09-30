@@ -88,7 +88,7 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun validateName(): Boolean {
+    fun validateName(): Boolean {
         val nameResult = Validator.userNameValidation(fName = _signUpState.value.name)
         _signUpState.value = signUpState.value.copy(
             nameError = !nameResult.status,
@@ -97,7 +97,7 @@ class SignUpViewModel @Inject constructor(
         return nameResult.status
     }
 
-    private fun validateNumber(): Boolean {
+    fun validateNumber(): Boolean {
         val numberResult = Validator.numberValidation(number = _signUpState.value.number)
         _signUpState.value = signUpState.value.copy(
             numberError = !numberResult.status,
@@ -106,7 +106,7 @@ class SignUpViewModel @Inject constructor(
         return numberResult.status
     }
 
-    private fun validateEmail(): Boolean {
+    fun validateEmail(): Boolean {
         val emailResult = Validator.emailValidation(email = _signUpState.value.email)
         _signUpState.value = signUpState.value.copy(
             emailError = !emailResult.status,
@@ -115,7 +115,7 @@ class SignUpViewModel @Inject constructor(
         return emailResult.status
     }
 
-    private fun validatePassword(): Boolean {
+    fun validatePassword(): Boolean {
         val passwordResult = Validator.passwordValidation(password = _signUpState.value.password)
         _signUpState.value = signUpState.value.copy(
             passwordError = !passwordResult.status,

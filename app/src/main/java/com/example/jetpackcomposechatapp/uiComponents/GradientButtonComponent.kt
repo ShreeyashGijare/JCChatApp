@@ -17,13 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcomposechatapp.R
-import com.example.jetpackcomposechatapp.ui.theme.colorBlue
-import com.example.jetpackcomposechatapp.ui.theme.colorPink
-import com.example.jetpackcomposechatapp.ui.theme.colorWhite
 
 @Composable
 fun PinkBackgroundButtonComponent(
@@ -45,7 +40,7 @@ fun PinkBackgroundButtonComponent(
                 .fillMaxWidth()
                 .heightIn(48.dp)
                 .background(
-                    color = colorPink,
+                    color = MaterialTheme.colorScheme.tertiary,
                     shape = RoundedCornerShape(10.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -53,7 +48,7 @@ fun PinkBackgroundButtonComponent(
             Text(
                 text = stringResource(id = buttonText),
                 style = MaterialTheme.typography.bodyLarge,
-                color = colorWhite
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -80,7 +75,7 @@ fun BlueBackgroundButtonComponent(
                 .fillMaxWidth()
                 .heightIn(48.dp)
                 .background(
-                    color = colorBlue,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(10.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -88,7 +83,7 @@ fun BlueBackgroundButtonComponent(
             Text(
                 text = stringResource(id = buttonText),
                 style = MaterialTheme.typography.bodyLarge,
-                color = colorWhite
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -107,13 +102,13 @@ fun PinkOutlinedButtonComponent(
             .heightIn(48.dp),
         contentPadding = PaddingValues(),
         colors = ButtonDefaults.buttonColors(Color.Transparent),
-        border = BorderStroke(2.dp, colorPink),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.tertiary),
         shape = RoundedCornerShape(10.dp)
     ) {
         Text(
             text = stringResource(id = buttonText),
             style = MaterialTheme.typography.bodyLarge,
-            color = colorPink
+            color = MaterialTheme.colorScheme.tertiary
         )
     }
 }
@@ -132,13 +127,13 @@ fun BlueOutlinedButtonComponent(
             .heightIn(48.dp),
         contentPadding = PaddingValues(),
         colors = ButtonDefaults.buttonColors(Color.Transparent),
-        border = BorderStroke(2.dp, colorBlue),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
         shape = RoundedCornerShape(10.dp)
     ) {
         Text(
             text = stringResource(id = buttonText),
             style = MaterialTheme.typography.bodyLarge,
-            color = colorBlue
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }

@@ -1,26 +1,25 @@
 package com.example.jetpackcomposechatapp.ui.loginSignUp.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,68 +29,45 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.jetpackcomposechatapp.R
-import com.example.jetpackcomposechatapp.navigation.navigateUpTo
 import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpEvents
 import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.SignUpViewModel
-import com.example.jetpackcomposechatapp.ui.theme.colorBlue
-import com.example.jetpackcomposechatapp.ui.theme.colorGray
-import com.example.jetpackcomposechatapp.ui.theme.colorLightGray
-import com.example.jetpackcomposechatapp.ui.theme.colorPink
-import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
-import com.example.jetpackcomposechatapp.uiComponents.CommonProgressBar
-import com.example.jetpackcomposechatapp.uiComponents.PinkBackgroundButtonComponent
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyExtraBold
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyMedium
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
+import com.example.jetpackcomposechatapp.uiComponents.BlueBackgroundButtonComponent
+import com.example.jetpackcomposechatapp.uiComponents.BodyMediumComponent
+import com.example.jetpackcomposechatapp.uiComponents.DisplayLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.HeadLineMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.OutlinedTextFieldComponent
 import com.example.jetpackcomposechatapp.uiComponents.PasswordTextFieldComponent
-import com.example.jetpackcomposechatapp.utils.AuthRouteScreen
 import com.example.jetpackcomposechatapp.utils.Graph
-import kotlinx.coroutines.delay
 
 @Composable
 fun SignUpScreen(
     rootNavController: NavController,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
-
     var showSecondScreen by remember {
         mutableStateOf(false)
     }
 
-    LaunchedEffect(key1 = Unit, block = {
-        delay(3000L)
-        showSecondScreen = true
-        delay(3000L)
-        showSecondScreen = false
-    })
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-
-        FirstNameScreen()
-        /*if (showSecondScreen) {
-            SecondScreen()
-        }*/
-
-        AnimatedVisibility(
-            visible = showSecondScreen,
-            enter = fadeIn() + slideInHorizontally(initialOffsetX = { it }),
-            exit = fadeOut() + slideOutHorizontally(targetOffsetX = { -it })
-        ) {
-            SecondScreen()
+    BackHandler {
+        if (showSecondScreen) {
+            showSecondScreen = false
+        } else {
+            rootNavController.navigateUp()
         }
-
     }
 
-    /*val signUpState by viewModel.signUpState
+    val signUpState by viewModel.signUpState
     val signUpSuccess by viewModel.signInSuccess.collectAsState()
 
     LaunchedEffect(key1 = signUpSuccess) {
@@ -106,114 +82,197 @@ fun SignUpScreen(
         }
     }
 
+    BasicDetailsScreen(
+        onNameChanged = {
+            viewModel.onEvent(SignUpEvents.Name(it))
+        },
+        isNameError = signUpState.nameError,
+        nameErrorMessage = signUpState.nameErrorMessage,
+        onNumberChanged = {
+            viewModel.onEvent(SignUpEvents.Number(it))
+        },
+        isNumberError = signUpState.numberError,
+        numberErrorMessage = signUpState.numberErrorMessage,
+        onContinueClick = {
+            if (viewModel.validateName() && viewModel.validateNumber()) {
+                showSecondScreen = true
+            } else {
+                viewModel.validateName()
+                viewModel.validateNumber()
+            }
+        }
+    )
+
+    AnimatedVisibility(
+        visible = showSecondScreen,
+        enter = fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+        exit = fadeOut() + slideOutHorizontally(targetOffsetX = { -it })
+    ) {
+        EmailPasswordScreen(
+            onEmailChanged = {
+                viewModel.onEvent(SignUpEvents.Email(it))
+            },
+            isEmailError = signUpState.emailError,
+            emailErrorMessage = signUpState.emailErrorMessage,
+            onPasswordChanged = {
+                viewModel.onEvent(SignUpEvents.Password(it))
+            },
+            isPasswordError = signUpState.passwordError,
+            passwordErrorMessage = signUpState.passwordErrorMessage,
+            onContinueClick = {
+
+            }
+        )
+    }
+}
+
+@Composable
+fun BasicDetailsScreen(
+    onNameChanged: (String) -> Unit,
+    isNameError: Boolean,
+    nameErrorMessage: String,
+    onNumberChanged: (String) -> Unit,
+    isNumberError: Boolean,
+    numberErrorMessage: String,
+    onContinueClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(
-                rememberScrollState()
-            )
-            .background(colorBlue)
+            .background(MaterialTheme.colorScheme.onPrimary)
             .padding(horizontal = 20.dp)
             .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.chat_icon_one),
-            contentDescription = null,
-            modifier = Modifier
-                .width(200.dp)
-                .padding(8.dp)
+        Spacer(modifier = Modifier.height(50.dp))
+        DisplayLargeComponent(
+            textValue = stringResource(id = R.string.app_name),
+            fontFamily = interFontFamilyExtraBold,
+            color = MaterialTheme.colorScheme.tertiary
         )
-        Spacer(modifier = Modifier.heightIn(10.dp))
         HeadLineMediumComponent(
-            textValue = stringResource(id = R.string.sign_up),
-            modifier = Modifier.heightIn(80.dp)
+            textValue = stringResource(R.string.app_slogan),
+            fontFamily = interFontFamilySemiBold,
+            color = MaterialTheme.colorScheme.primary
         )
-        Spacer(modifier = Modifier.heightIn(20.dp))
+        Spacer(modifier = Modifier.fillMaxHeight(.1f))
+        BodyMediumComponent(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start,
+            textValue = stringResource(R.string.what_should_you_be_called),
+            fontFamily = interFontFamilyMedium
+        )
+        Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextFieldComponent(
             labelValue = "Enter your Name",
             leadingIcon = Icons.Default.AccountCircle,
             onTextSelected = {
-                viewModel.onEvent(SignUpEvents.Name(it))
+                onNameChanged(it)
             },
-            isError = signUpState.nameError,
-            errorMessage = signUpState.nameErrorMessage
+            isError = isNameError,
+            errorMessage = nameErrorMessage
         )
-        Spacer(modifier = Modifier.heightIn(10.dp))
+        Spacer(modifier = Modifier.height(30.dp))
+        BodyMediumComponent(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start,
+            textValue = stringResource(R.string.enter_mobile_text),
+            fontFamily = interFontFamilyMedium
+        )
+        Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextFieldComponent(
             labelValue = "Enter your Number",
             leadingIcon = Icons.Default.PhoneAndroid,
             onTextSelected = {
-                viewModel.onEvent(SignUpEvents.Number(it))
+                onNumberChanged(it)
             },
-            isError = signUpState.numberError,
-            errorMessage = signUpState.numberErrorMessage,
-            keyboardType = KeyboardType.Number
+            isError = isNumberError,
+            errorMessage = numberErrorMessage,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Number
+            )
         )
-        Spacer(modifier = Modifier.heightIn(10.dp))
-        OutlinedTextFieldComponent(
-            labelValue = "Enter your Email",
-            leadingIcon = Icons.Default.Email,
-            onTextSelected = {
-                viewModel.onEvent(SignUpEvents.Email(it))
-            },
-            isError = signUpState.emailError,
-            errorMessage = signUpState.emailErrorMessage,
-            keyboardType = KeyboardType.Email
-        )
-        Spacer(modifier = Modifier.heightIn(10.dp))
-        PasswordTextFieldComponent(
-            labelValue = "Enter your Password", onTextSelected = {
-                viewModel.onEvent(SignUpEvents.Password(it))
-            },
-            isError = signUpState.passwordError,
-            errorMessage = signUpState.passwordErrorMessage
-        )
-        Spacer(modifier = Modifier.heightIn(30.dp))
-        PinkBackgroundButtonComponent(
-            buttonText = R.string.sign_up,
-            modifier = Modifier.padding(horizontal = 40.dp)
+        Spacer(modifier = Modifier.fillMaxHeight(.8f))
+        BlueBackgroundButtonComponent(
+            buttonText = R.string.continue_text
         ) {
-            viewModel.onEvent(SignUpEvents.SignUpButtonClick)
+            onContinueClick.invoke()
         }
-        Spacer(modifier = Modifier.heightIn(10.dp))
-        BodySmallComponent(textValue = stringResource(id = R.string.already_have_account)) {
-            rootNavController.popBackStack()
-            navigateUpTo(rootNavController, AuthRouteScreen.LoginScreen.route)
-        }
-
+        Spacer(modifier = Modifier.fillMaxHeight(.1f))
     }
-    if (viewModel.inProgress.value) {
-        CommonProgressBar()
-    }*/
 }
 
 @Composable
-fun FirstNameScreen() {
-
-
+fun EmailPasswordScreen(
+    onEmailChanged: (String) -> Unit,
+    isEmailError: Boolean,
+    emailErrorMessage: String,
+    onPasswordChanged: (String) -> Unit,
+    isPasswordError: Boolean,
+    passwordErrorMessage: String,
+    onContinueClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorPink)
-            .statusBarsPadding()
+            .background(MaterialTheme.colorScheme.onPrimary)
+            .padding(horizontal = 20.dp)
+            .statusBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(50.dp))
+        DisplayLargeComponent(
+            textValue = stringResource(id = R.string.app_name),
+            fontFamily = interFontFamilyExtraBold,
+            color = MaterialTheme.colorScheme.tertiary
+        )
+        HeadLineMediumComponent(
+            textValue = stringResource(R.string.app_slogan),
+            fontFamily = interFontFamilySemiBold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.fillMaxHeight(.1f))
+        BodyMediumComponent(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start,
+            textValue = stringResource(R.string.what_should_you_be_called),
+            fontFamily = interFontFamilyMedium
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        OutlinedTextFieldComponent(
+            labelValue = stringResource(R.string.enter_email),
+            leadingIcon = Icons.Default.AccountCircle,
+            onTextSelected = {
+                onEmailChanged(it)
+            },
+            isError = isEmailError,
+            errorMessage = emailErrorMessage
+        )
+        Spacer(modifier = Modifier.height(30.dp))
+        BodyMediumComponent(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start,
+            textValue = stringResource(R.string.enter_mobile_text),
+            fontFamily = interFontFamilyMedium
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        PasswordTextFieldComponent(
+            labelValue = stringResource(R.string.enter_password), onTextSelected = {
+                onPasswordChanged(it)
+            },
+            isError = isPasswordError,
+            errorMessage = passwordErrorMessage,
+            onDone = {
 
+            }
+        )
+        Spacer(modifier = Modifier.fillMaxHeight(.8f))
+        BlueBackgroundButtonComponent(
+            buttonText = R.string.continue_text
+        ) {
+            onContinueClick.invoke()
+        }
+        Spacer(modifier = Modifier.fillMaxHeight(.1f))
     }
-
-}
-
-@Composable
-fun SecondScreen() {
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorGray)
-            .statusBarsPadding()
-    ) {
-
-    }
-
 }

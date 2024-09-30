@@ -1,5 +1,6 @@
 package com.example.jetpackcomposechatapp.uiComponents
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -26,6 +28,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -35,6 +40,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamily
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyMedium
+import com.example.jetpackcomposechatapp.ui.theme.lightBlue
+import com.example.jetpackcomposechatapp.ui.theme.veryLightBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,8 +52,11 @@ fun OutlinedTextFieldComponent(
     onTextSelected: (String) -> Unit,
     errorMessage: String = "",
     isError: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    fontFamily: FontFamily = interFontFamily
+    fontFamily: FontFamily = interFontFamilyMedium,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        imeAction = ImeAction.Next,
+        keyboardType = KeyboardType.Text
+    )
 ) {
 
     var textValue: String by remember {
@@ -67,7 +78,22 @@ fun OutlinedTextFieldComponent(
         }
         OutlinedTextField(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .border(
+                    width = 2.dp,
+                    brush = if (isError) Brush.linearGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.error,
+                            MaterialTheme.colorScheme.error
+                        )
+                    ) else Brush.linearGradient(
+                        colors = listOf(
+                            veryLightBlue,
+                            lightBlue
+                        )
+                    ),
+                    shape = RoundedCornerShape(5.dp)
+                ),
             /*label = {
                 Text(text = labelValue, fontFamily = fontFamily)
             },*/
@@ -77,22 +103,19 @@ fun OutlinedTextFieldComponent(
                 onTextSelected(it)
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = Color.Transparent,
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
-                focusedTextColor = MaterialTheme.colorScheme.primary,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+                focusedTextColor = MaterialTheme.colorScheme.secondary,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedBorderColor = Color.Transparent,
                 unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
-                unfocusedTextColor = MaterialTheme.colorScheme.secondary,
+                unfocusedTextColor = MaterialTheme.colorScheme.primary,
                 errorLeadingIconColor = MaterialTheme.colorScheme.error,
                 errorBorderColor = MaterialTheme.colorScheme.error,
                 errorLabelColor = MaterialTheme.colorScheme.error,
                 errorTextColor = MaterialTheme.colorScheme.error
             ),
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-                keyboardType = keyboardType
-            ),
+            keyboardOptions = keyboardOptions,
             singleLine = true,
             /*leadingIcon = {
                 Icon(imageVector = leadingIcon, contentDescription = null)
@@ -124,7 +147,8 @@ fun PasswordTextFieldComponent(
     onTextSelected: (String) -> Unit,
     isError: Boolean = false,
     errorMessage: String = "",
-    fontFamily: FontFamily = interFontFamily
+    fontFamily: FontFamily = interFontFamilyMedium,
+    onDone: () -> Unit
 ) {
 
     var textValue: String by remember {
@@ -148,23 +172,36 @@ fun PasswordTextFieldComponent(
             )
         }
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            /*label = {
-                Text(text = labelValue, fontFamily = fontFamily)
-            },*/
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 2.dp,
+                    brush = if (isError) Brush.linearGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.error,
+                            MaterialTheme.colorScheme.error
+                        )
+                    ) else Brush.linearGradient(
+                        colors = listOf(
+                            veryLightBlue,
+                            lightBlue
+                        )
+                    ),
+                    shape = RoundedCornerShape(5.dp)
+                ),
             value = textValue,
             onValueChange = {
                 textValue = it
                 onTextSelected(it)
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = Color.Transparent,
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
-                focusedTextColor = MaterialTheme.colorScheme.primary,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+                focusedTextColor = MaterialTheme.colorScheme.secondary,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedBorderColor = Color.Transparent,
                 unfocusedLabelColor = MaterialTheme.colorScheme.secondary,
-                unfocusedTextColor = MaterialTheme.colorScheme.secondary,
+                unfocusedTextColor = MaterialTheme.colorScheme.primary,
                 errorLeadingIconColor = MaterialTheme.colorScheme.error,
                 errorBorderColor = MaterialTheme.colorScheme.error,
                 errorLabelColor = MaterialTheme.colorScheme.error,
@@ -173,6 +210,11 @@ fun PasswordTextFieldComponent(
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Default,
                 keyboardType = KeyboardType.Password
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    onDone.invoke()
+                }
             ),
             singleLine = true,
             leadingIcon = {

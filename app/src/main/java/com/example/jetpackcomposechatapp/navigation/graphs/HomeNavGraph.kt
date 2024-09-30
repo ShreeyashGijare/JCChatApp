@@ -32,8 +32,7 @@ fun HomeNavGraph(
     NavHost(
         navController = homeNavController,
         route = Graph.HOME_GRAPH,
-        startDestination = HomeRouteScreen.ChatListScreen.route,
-        modifier = Modifier.padding(paddingValues)
+        startDestination = HomeRouteScreen.ChatListScreen.route
     ) {
         composable(
             HomeRouteScreen.ChatListScreen.route,
@@ -50,9 +49,12 @@ fun HomeNavGraph(
                 )
             }
         ) {
-            ChatListScreen(navController = rootNavController,homeNavController = homeNavController, onShowSnackBar = { message ->
-                onShowSnackBar(message)
-            })
+            ChatListScreen(
+                navController = rootNavController,
+                homeNavController = homeNavController,
+                onShowSnackBar = { message ->
+                    onShowSnackBar(message)
+                })
         }
 
         composable(

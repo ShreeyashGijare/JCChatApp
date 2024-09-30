@@ -2,7 +2,6 @@ package com.example.jetpackcomposechatapp.uiComponents
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -36,21 +36,17 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposechatapp.ui.mainContent.data.bottomNavigationItem.BottomNavigationItem
-import com.example.jetpackcomposechatapp.ui.theme.colorBlue
-import com.example.jetpackcomposechatapp.ui.theme.colorPink
-import com.example.jetpackcomposechatapp.ui.theme.colorWhite
 import com.example.jetpackcomposechatapp.uiComponents.shape.HoleRectShape
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-@OptIn(ExperimentalTransitionApi::class)
 @Composable
 fun JumpingBottomBar(
     items: List<BottomNavigationItem>,
     selected: BottomNavigationItem,
     modifier: Modifier = Modifier,
-    containerColor: Color = colorWhite,
-    ballContainerColor: Color = colorBlue,
+    containerColor: Color = MaterialTheme.colorScheme.onPrimary,
+    ballContainerColor: Color = MaterialTheme.colorScheme.primary,
     onJump: (BottomNavigationItem) -> Unit,
 ) {
 
@@ -182,7 +178,7 @@ fun JumpingBottomBar(
                     Icon(
                         imageVector = if (item == selected) item.selectedIcon else item.unSelectedIcon,
                         contentDescription = item.title,
-                        tint = if (item == selected) colorWhite else colorBlue
+                        tint = if (item == selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
                     )
                 }
             }
