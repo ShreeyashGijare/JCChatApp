@@ -78,7 +78,6 @@ class ProfileViewModel @Inject constructor(
         } else {
             Log.i("UploadImageToFirebase", "Empty Image")
         }
-
     }
 }
 

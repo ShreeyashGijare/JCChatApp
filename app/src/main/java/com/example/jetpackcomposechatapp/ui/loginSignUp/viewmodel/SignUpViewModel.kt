@@ -1,5 +1,6 @@
 package com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +28,7 @@ import javax.inject.Inject
 class SignUpViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore,
-    private val firebaseStorage: FirebaseStorage
+    private val storage: FirebaseStorage
 ) : ViewModel() {
 
     private val TAG: String = SignUpViewModel::class.java.name
@@ -37,34 +38,34 @@ class SignUpViewModel @Inject constructor(
     var inProgress = mutableStateOf(false)
     private val eventMutableState = mutableStateOf<Events<String>?>(null)
 
-    private val _SignInSuccess = MutableStateFlow(false)
-    var signInSuccess: StateFlow<Boolean> = _SignInSuccess
+    private val _signInSuccess = MutableStateFlow(false)
+    var signInSuccess: StateFlow<Boolean> = _signInSuccess
 
     fun onEvent(event: SignUpEvents) {
         when (event) {
             is SignUpEvents.Name -> {
-                _signUpState.value = signUpState.value.copy(
+                _signUpState.value = _signUpState.value.copy(
                     name = event.name
                 )
                 validateName()
             }
 
             is SignUpEvents.Email -> {
-                _signUpState.value = signUpState.value.copy(
+                _signUpState.value = _signUpState.value.copy(
                     email = event.email
                 )
                 validateEmail()
             }
 
             is SignUpEvents.Number -> {
-                _signUpState.value = signUpState.value.copy(
+                _signUpState.value = _signUpState.value.copy(
                     number = event.number
                 )
                 validateNumber()
             }
 
             is SignUpEvents.Password -> {
-                _signUpState.value = signUpState.value.copy(
+                _signUpState.value = _signUpState.value.copy(
                     password = event.password
                 )
                 validatePassword()
@@ -73,10 +74,11 @@ class SignUpViewModel @Inject constructor(
             SignUpEvents.SignUpButtonClick -> {
                 if (validateName() && validateNumber() && validateEmail() && validatePassword()) {
                     signUp(
-                        _signUpState.value.name,
-                        _signUpState.value.number,
-                        _signUpState.value.email,
-                        _signUpState.value.password
+                        name = _signUpState.value.name,
+                        number = _signUpState.value.number,
+                        email = _signUpState.value.email,
+                        password = _signUpState.value.password,
+                        imageUrl = _signUpState.value.imageUrl
                     )
                 } else {
                     validateName()
@@ -85,12 +87,41 @@ class SignUpViewModel @Inject constructor(
                     validatePassword()
                 }
             }
+
+            is SignUpEvents.UploadImage -> {
+                uploadImageToFireBaseStorage(event.imageUri) {
+                    _signUpState.value = _signUpState.value.copy(
+
+                    )
+                }
+            }
         }
+    }
+
+    private fun uploadImageToFireBaseStorage(
+        profileImage: Uri,
+        imageUploadSuccess: (String) -> Unit
+    ) {
+        val imageRef = storage.reference.child("images/${System.currentTimeMillis()}")
+        if (profileImage.path != "") {
+            imageRef.putFile(profileImage)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl
+                        .addOnSuccessListener { firebaseImageUri ->
+                            imageUploadSuccess.invoke(firebaseImageUri.toString())
+                        }
+                }.addOnFailureListener {
+                    Log.i("UploadImageToFirebase", "Upload Failed")
+                }
+        } else {
+            Log.i("UploadImageToFirebase", "Empty Image")
+        }
+
     }
 
     fun validateName(): Boolean {
         val nameResult = Validator.userNameValidation(fName = _signUpState.value.name)
-        _signUpState.value = signUpState.value.copy(
+        _signUpState.value = _signUpState.value.copy(
             nameError = !nameResult.status,
             nameErrorMessage = nameResult.errorMessage
         )
@@ -99,7 +130,7 @@ class SignUpViewModel @Inject constructor(
 
     fun validateNumber(): Boolean {
         val numberResult = Validator.numberValidation(number = _signUpState.value.number)
-        _signUpState.value = signUpState.value.copy(
+        _signUpState.value = _signUpState.value.copy(
             numberError = !numberResult.status,
             numberErrorMessage = numberResult.errorMessage
         )
@@ -108,7 +139,7 @@ class SignUpViewModel @Inject constructor(
 
     fun validateEmail(): Boolean {
         val emailResult = Validator.emailValidation(email = _signUpState.value.email)
-        _signUpState.value = signUpState.value.copy(
+        _signUpState.value = _signUpState.value.copy(
             emailError = !emailResult.status,
             emailErrorMessage = emailResult.errorMessage
         )
@@ -117,15 +148,20 @@ class SignUpViewModel @Inject constructor(
 
     fun validatePassword(): Boolean {
         val passwordResult = Validator.passwordValidation(password = _signUpState.value.password)
-        _signUpState.value = signUpState.value.copy(
+        _signUpState.value = _signUpState.value.copy(
             passwordError = !passwordResult.status,
             passwordErrorMessage = passwordResult.errorMessage
         )
         return passwordResult.status
     }
 
-    private fun signUp(name: String, number: String, email: String, password: String) {
-
+    private fun signUp(
+        name: String,
+        number: String,
+        email: String,
+        password: String,
+        imageUrl: String
+    ) {
         viewModelScope.launch {
             inProgress.value = true
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
@@ -133,7 +169,8 @@ class SignUpViewModel @Inject constructor(
                     createOrUpdateProfile(
                         name = name,
                         number = number,
-                        email = email
+                        email = email,
+                        imageUrl = imageUrl
                     )
                 } else {
                     Log.i("SIGNUP", "Error")
@@ -197,7 +234,7 @@ class SignUpViewModel @Inject constructor(
                 if (value != null) {
                     val user = value.toObject<UserData>()
                     inProgress.value = false
-                    _SignInSuccess.value = true
+                    _signInSuccess.value = true
                 }
             }
         }
@@ -207,7 +244,7 @@ class SignUpViewModel @Inject constructor(
         inProgress.value = false
         Log.e(TAG, "handleException: ", exception)
         val errorMessage = exception?.localizedMessage ?: ""
-        val message = if (customMessage.isNullOrEmpty()) errorMessage else customMessage
+        val message = if (customMessage.isEmpty()) errorMessage else customMessage
         eventMutableState.value = Events(message)
     }
 

@@ -47,8 +47,6 @@ fun ProfileScreen(
     profileVieModel: ProfileViewModel = hiltViewModel()
 ) {
 
-//    val firebaseAuth = profileVieModel.auth
-
     val context = LocalContext.current
 
 

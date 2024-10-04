@@ -30,18 +30,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamily
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyMedium
-import com.example.jetpackcomposechatapp.ui.theme.lightBlue
 import com.example.jetpackcomposechatapp.ui.theme.veryLightBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,18 +48,20 @@ import com.example.jetpackcomposechatapp.ui.theme.veryLightBlue
 fun OutlinedTextFieldComponent(
     labelValue: String,
     leadingIcon: ImageVector,
+    text: String = "",
     onTextSelected: (String) -> Unit,
     errorMessage: String = "",
     isError: Boolean = false,
     fontFamily: FontFamily = interFontFamilyMedium,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
         imeAction = ImeAction.Next,
-        keyboardType = KeyboardType.Text
+        keyboardType = KeyboardType.Text,
+        capitalization = KeyboardCapitalization.None
     )
 ) {
 
     var textValue: String by remember {
-        mutableStateOf("")
+        mutableStateOf(text)
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -89,7 +90,7 @@ fun OutlinedTextFieldComponent(
                     ) else Brush.linearGradient(
                         colors = listOf(
                             veryLightBlue,
-                            lightBlue
+                            MaterialTheme.colorScheme.secondary
                         )
                     ),
                     shape = RoundedCornerShape(5.dp)
@@ -184,7 +185,7 @@ fun PasswordTextFieldComponent(
                     ) else Brush.linearGradient(
                         colors = listOf(
                             veryLightBlue,
-                            lightBlue
+                            MaterialTheme.colorScheme.secondary
                         )
                     ),
                     shape = RoundedCornerShape(5.dp)

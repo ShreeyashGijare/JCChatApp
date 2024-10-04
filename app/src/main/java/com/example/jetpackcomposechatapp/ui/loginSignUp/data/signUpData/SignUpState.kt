@@ -12,5 +12,6 @@ data class SignUpState(
     val emailError: Boolean = false,
     val emailErrorMessage: String = "",
     val passwordError: Boolean = false,
-    val passwordErrorMessage: String = ""
+    val passwordErrorMessage: String = "",
+    val imageUrl: String = ""
 )

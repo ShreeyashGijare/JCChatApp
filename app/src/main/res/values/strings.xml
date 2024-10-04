@@ -31,5 +31,8 @@
     <string name="enter_mobile_text">To connect, please share your mobile number!</string>
     <string name="enter_email">Enter your Email</string>
     <string name="enter_password">Enter your Password</string>
+    <string name="enter_email_prompt">Be part of the community and start chatting with ease. Enter your email to sign up now and connect with friends instantly! 🚀</string>
+    <string name="image_prompt">Quickly add a image a showcase yourself</string>
+    <string name="image_success_prompt">That looks great!!! 🎉🎊 You are ready to kick off!!!! 🥳🚀</string>
 
 </resources>
