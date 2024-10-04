@@ -83,7 +83,7 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     var currentDisplayedScreen by remember {
-        mutableStateOf(SignUpScreens.ImageUploadScreen)
+        mutableStateOf(SignUpScreens.BasicDetailsScreen)
     }
 
     BackHandler {
@@ -463,7 +463,6 @@ fun AnimatedText(
         mutableStateOf("")
     }
     LaunchedEffect(text) {
-        delay(500)
         breakIterator.text = StringCharacterIterator(text)
         var nextIndex = breakIterator.next()
         while (nextIndex != BreakIterator.DONE) {
