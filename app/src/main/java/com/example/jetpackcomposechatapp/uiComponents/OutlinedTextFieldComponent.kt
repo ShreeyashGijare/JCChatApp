@@ -141,7 +141,6 @@ fun OutlinedTextFieldComponent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordTextFieldComponent(
     labelValue: String,

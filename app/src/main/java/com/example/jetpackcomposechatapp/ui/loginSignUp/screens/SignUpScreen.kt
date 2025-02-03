@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,6 +16,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,12 +26,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,11 +59,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.ui.loginSignUp.data.signUpData.SignUpEvents
 import com.example.jetpackcomposechatapp.ui.loginSignUp.viewmodel.SignUpViewModel
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ProfileEvents
+import com.example.jetpackcomposechatapp.ui.theme.colorRed
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyExtraBold
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyMedium
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
@@ -71,6 +76,7 @@ import com.example.jetpackcomposechatapp.uiComponents.HeadLineMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.OutlinedTextFieldComponent
 import com.example.jetpackcomposechatapp.uiComponents.PasswordTextFieldComponent
 import com.example.jetpackcomposechatapp.uiComponents.blueBackground
+import com.example.jetpackcomposechatapp.uiComponents.shape.dashedBorder
 import com.example.jetpackcomposechatapp.utils.Graph
 import kotlinx.coroutines.delay
 import java.io.ByteArrayOutputStream
@@ -84,6 +90,10 @@ fun SignUpScreen(
 ) {
     var currentDisplayedScreen by remember {
         mutableStateOf(SignUpScreens.BasicDetailsScreen)
+    }
+
+    var profileImageUri by remember {
+        mutableStateOf(viewModel.profileImageUri)
     }
 
     BackHandler {
@@ -188,8 +198,20 @@ fun SignUpScreen(
 
             SignUpScreens.ImageUploadScreen -> {
                 ImageUploadScreen(
+                    imageUri = profileImageUri,
+                    imageUploadError = signUpState.imageError,
+                    imageUploadErrorMessage = signUpState.imageErrorMessage,
                     onUploadImage = { profileImageUri ->
+                        profileImageUri?.let {
+                            viewModel.onEvent(SignUpEvents.UploadImage(it))
+                        }
 
+                    },
+                    onContinueButtonClick = {
+                        viewModel.onEvent(SignUpEvents.SignUpButtonClick)
+                    },
+                    onRemoveImage = {
+                        viewModel.onEvent(SignUpEvents.UploadImage(null))
                     }
                 )
             }
@@ -271,13 +293,13 @@ fun BasicDetailsScreen(
                 keyboardType = KeyboardType.Number
             )
         )
-        Spacer(modifier = Modifier.fillMaxHeight(.8f))
+        Spacer(modifier = Modifier.weight(1f))
         BlueBackgroundButtonComponent(
             buttonText = R.string.continue_text
         ) {
             onContinueClick.invoke()
         }
-        Spacer(modifier = Modifier.fillMaxHeight(.1f))
+        Spacer(modifier = Modifier.weight(.1f))
     }
 }
 
@@ -345,24 +367,29 @@ fun EmailPasswordScreen(
                 onContinueClick.invoke()
             }
         )
-        Spacer(modifier = Modifier.fillMaxHeight(.8f))
+        Spacer(modifier = Modifier.weight(1f))
         BlueBackgroundButtonComponent(
             buttonText = R.string.continue_text
         ) {
             onContinueClick.invoke()
         }
-        Spacer(modifier = Modifier.fillMaxHeight(.1f))
+        Spacer(modifier = Modifier.weight(.1f))
     }
 }
 
 @Composable
 fun ImageUploadScreen(
-    onUploadImage: (Uri) -> Unit
+    imageUri: Uri?,
+    imageUploadError: Boolean,
+    imageUploadErrorMessage: String,
+    onUploadImage: (Uri?) -> Unit,
+    onContinueButtonClick: () -> Unit,
+    onRemoveImage: (() -> Unit)?
 ) {
 
     val context = LocalContext.current
     var imgUri by remember {
-        mutableStateOf<Uri?>(null)
+        mutableStateOf(imageUri)
     }
 
     val launcher =
@@ -380,7 +407,6 @@ fun ImageUploadScreen(
                 onUploadImage.invoke(profileImageUri)
             }
         }
-
 
     Column(
         modifier = Modifier
@@ -419,28 +445,68 @@ fun ImageUploadScreen(
                 },
             contentAlignment = Alignment.BottomEnd
         ) {
-            Image(
-                painter =
-                if (imgUri != null
-                ) rememberImagePainter(data = imgUri) else painterResource(
-                    id = R.drawable.ic_profile
-                ), contentDescription = "",
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.FillBounds
-            )
-
             if (imgUri == null) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Image",
+
+                Log.i("ProfileImage", "No Image")
+
+                Column(
                     modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .padding(6.dp),
-                    tint = Color.White
-                )
+                        .size(200.dp)
+                        .dashedBorder(
+                            color = if (imageUploadError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
+                            shape = RoundedCornerShape(20.dp),
+                            gapLength = 10.dp,
+                            dashLength = 10.dp,
+                            strokeWidth = 2.dp
+                        ),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add Image",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .dashedBorder(
+                                color = if (imageUploadError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
+                                shape = RoundedCornerShape(20.dp),
+                                gapLength = 10.dp,
+                                dashLength = 10.dp,
+                                strokeWidth = 2.dp
+                            )
+                            .padding(6.dp),
+                        tint = if (imageUploadError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            } else {
+
+
+                Log.i("ProfileImage", "Have  Image")
+                Box(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(RoundedCornerShape(20.dp)),
+                    contentAlignment = Alignment.TopEnd
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = imgUri), contentDescription = "",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(RoundedCornerShape(20.dp)),
+                        contentScale = ContentScale.FillBounds
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Add Image",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(6.dp)
+                            .clickable {
+                                onRemoveImage?.invoke()
+                            },
+
+                        )
+                }
             }
         }
 
@@ -448,6 +514,13 @@ fun ImageUploadScreen(
             Spacer(modifier = Modifier.height(20.dp))
             AnimatedText(text = stringResource(R.string.image_success_prompt))
         }
+        Spacer(modifier = Modifier.weight(1f))
+        BlueBackgroundButtonComponent(
+            buttonText = R.string.continue_text
+        ) {
+            onContinueButtonClick.invoke()
+        }
+        Spacer(modifier = Modifier.weight(.1f))
     }
 }
 
@@ -477,11 +550,10 @@ fun AnimatedText(
         textAlign = TextAlign.Start,
         fontFamily = interFontFamilySemiBold
     )
-
 }
 
-enum class SignUpScreens() {
-    BasicDetailsScreen(),
-    EmailPasswordScreen(),
-    ImageUploadScreen()
+enum class SignUpScreens {
+    BasicDetailsScreen,
+    EmailPasswordScreen,
+    ImageUploadScreen
 }

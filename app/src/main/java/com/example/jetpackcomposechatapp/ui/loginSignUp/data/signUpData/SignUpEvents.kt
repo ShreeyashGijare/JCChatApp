@@ -9,7 +9,7 @@ sealed class SignUpEvents {
     data class Email(val email: String) : SignUpEvents()
     data class Password(val password: String) : SignUpEvents()
 
-    data class UploadImage(val imageUri: Uri) : SignUpEvents()
+    data class UploadImage(val imageUri: Uri?) : SignUpEvents()
 
     object SignUpButtonClick : SignUpEvents()
 

@@ -41,6 +41,9 @@ class SignUpViewModel @Inject constructor(
     private val _signInSuccess = MutableStateFlow(false)
     var signInSuccess: StateFlow<Boolean> = _signInSuccess
 
+    private var _profileImageUri: Uri? = null
+    val profileImageUri get() = _profileImageUri
+
     fun onEvent(event: SignUpEvents) {
         when (event) {
             is SignUpEvents.Name -> {
@@ -72,30 +75,45 @@ class SignUpViewModel @Inject constructor(
             }
 
             SignUpEvents.SignUpButtonClick -> {
-                if (validateName() && validateNumber() && validateEmail() && validatePassword()) {
-                    signUp(
-                        name = _signUpState.value.name,
-                        number = _signUpState.value.number,
-                        email = _signUpState.value.email,
-                        password = _signUpState.value.password,
-                        imageUrl = _signUpState.value.imageUrl
-                    )
+                if (validateName() && validateNumber() && validateEmail() && validatePassword() && validateProfileUri()) {
+
+                    uploadImageToFireBaseStorage(profileImageUri!!) { profileImageUrl ->
+                        _signUpState.value = _signUpState.value.copy(
+                            imageUrl = profileImageUrl
+                        )
+                        signUp(
+                            name = _signUpState.value.name,
+                            number = _signUpState.value.number,
+                            email = _signUpState.value.email,
+                            password = _signUpState.value.password,
+                            imageUrl = _signUpState.value.imageUrl
+                        )
+                    }
+
+
                 } else {
-                    validateName()
+                    /*validateName()
                     validateNumber()
                     validateEmail()
-                    validatePassword()
+                    validatePassword()*/
+                    validateProfileUri()
                 }
             }
 
             is SignUpEvents.UploadImage -> {
-                uploadImageToFireBaseStorage(event.imageUri) {
+                saveImageUri(event.imageUri)
+                /*uploadImageToFireBaseStorage(event.imageUri) {
                     _signUpState.value = _signUpState.value.copy(
 
                     )
-                }
+                }*/
+                validateProfileUri()
             }
         }
+    }
+
+    private fun saveImageUri(profileImageUri: Uri?) {
+        this._profileImageUri = profileImageUri
     }
 
     private fun uploadImageToFireBaseStorage(
@@ -153,6 +171,15 @@ class SignUpViewModel @Inject constructor(
             passwordErrorMessage = passwordResult.errorMessage
         )
         return passwordResult.status
+    }
+
+    private fun validateProfileUri(): Boolean {
+        val validateProfileUri = _profileImageUri != null
+        _signUpState.value = _signUpState.value.copy(
+            imageError = !validateProfileUri,
+            imageErrorMessage = "Please add a profile image!!"
+        )
+        return validateProfileUri
     }
 
     private fun signUp(

@@ -105,7 +105,8 @@ class ChatViewModel @Inject constructor(
             name = currentUser?.name,
             number = currentUser?.number,
             emailId = currentUser?.emailId,
-            userId = currentUser?.userId
+            userId = currentUser?.userId/*,
+            timeStamp = Calendar.getInstance().timeInMillis*/
         )
 
         val receiverUserListObject = ChatUserObject(
@@ -113,7 +114,8 @@ class ChatViewModel @Inject constructor(
             name = _receiverUser.value.name,
             number = _receiverUser.value.number,
             emailId = _receiverUser.value.emailId,
-            userId = _receiverUser.value.userId
+            userId = _receiverUser.value.userId/*,
+            timeStamp = Calendar.getInstance().timeInMillis*/
         )
 
         _chatState.value = _chatState.value.copy(
@@ -138,6 +140,7 @@ class ChatViewModel @Inject constructor(
                 receiverUserObjectRef.set(receiverUserListObject)
             } else {
                 Log.i("ChatMessage-receiver", " -->  Exists")
+                receiverUserObjectRef.set(receiverUserListObject.copy(timeStamp = Calendar.getInstance().timeInMillis))
             }
         }
 
@@ -153,6 +156,7 @@ class ChatViewModel @Inject constructor(
                 senderUserObjectRef.set(currentUserListObject)
             } else {
                 Log.i("ChatMessage-sender", " -->  Exists")
+                senderUserObjectRef.set(currentUserListObject.copy(timeStamp = Calendar.getInstance().timeInMillis))
             }
         }
 

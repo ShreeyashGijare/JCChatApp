@@ -16,6 +16,8 @@ import com.google.firebase.firestore.toObjects
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,14 +30,14 @@ class ChatListViewModel @Inject constructor(
     var currentUser = MutableStateFlow(UserData())
 
     private val _chatUserList = MutableStateFlow<List<ChatUserObject>>(emptyList())
-    val chatUserList: StateFlow<List<ChatUserObject>> = _chatUserList
+    val chatUserList: StateFlow<List<ChatUserObject>> = _chatUserList.asStateFlow()
 
-    private val _error = MutableStateFlow<ErrorState>(ErrorState())
+    private val _error = MutableStateFlow(ErrorState())
     val error: StateFlow<ErrorState> = _error
 
-    init {
+    /*init {
         getUserChats()
-    }
+    }*/
 
     init {
         getUserData(auth.currentUser?.uid!!)
@@ -56,28 +58,24 @@ class ChatListViewModel @Inject constructor(
     }
 
 
-    private fun getUserChats() {
+    fun getUserChats() {
         db.collection(CHAT_LIST_NODE).document(auth.currentUser?.uid!!)
-            .collection(CHAT_LIST_USER_NODE)
+                .collection(CHAT_LIST_USER_NODE)
             .orderBy("timeStamp", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    viewModelScope.launch {
-                        _error.emit(
-                            _error.value.copy(
-                                isError = true,
-                                errorMessage = error.message.toString()
-                            )
+                    _error.update {errorState ->
+                        errorState.copy(
+                            isError = true,
+                            errorMessage = error.message.toString()
                         )
                     }
                 }
                 if (value != null) {
-                    viewModelScope.launch {
-                        _chatUserList.emit(value.toObjects<ChatUserObject>())
+                    _chatUserList.update {
+                        value.toObjects()
                     }
                 }
-
             }
     }
-
 }

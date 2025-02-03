@@ -56,6 +56,7 @@ import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
+import com.example.jetpackcomposechatapp.utils.DateUtils.formatMessageTimeStampToDate
 import com.example.jetpackcomposechatapp.utils.Graph
 import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
 import com.google.firebase.auth.ktx.auth
@@ -83,6 +84,10 @@ fun ChatListScreen(
     val context = LocalContext.current
 
     val chatList by viewModel.chatUserList.collectAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getUserChats()
+    }
 
     LaunchedEffect(key1 = viewModel.error) {
         viewModel.error.collectLatest {
@@ -272,6 +277,9 @@ fun UserChatItem(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
+        //Add unread messages count here
+        Spacer(modifier = Modifier.weight(1f))
+        LabelSmallComponent(textValue = formatMessageTimeStampToDate(user.timeStamp))
     }
 
 

@@ -66,6 +66,8 @@ import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatViewModel
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
 import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
+import com.example.jetpackcomposechatapp.utils.DateUtils.convertLongToTimeAMPM
+import com.example.jetpackcomposechatapp.utils.DateUtils.formatDate
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
@@ -157,7 +159,7 @@ fun ChatScreenTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.onBackground)
+            .background(MaterialTheme.colorScheme.onPrimary)
             .padding(vertical = 10.dp, horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -233,7 +235,6 @@ fun MessageItem(message: ChatState) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreenBottomBar(
     onSendButtonClick: (String) -> Unit
@@ -244,7 +245,7 @@ fun ChatScreenBottomBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.onBackground)
+            .background(MaterialTheme.colorScheme.onPrimary)
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -300,41 +301,6 @@ fun ChatScreenBottomBar(
                 tint = if (message.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
             )
         }
-    }
-}
-
-fun convertLongToTimeAMPM(time: Long): String {
-    val date = Date(time)
-    val format = SimpleDateFormat("hh:mm", Locale.getDefault())
-    return format.format(date)
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun getFormattedDateLabel(timeInMillis: Long): String {
-    val dateTime =
-        LocalDateTime.ofInstant(Instant.ofEpochMilli(timeInMillis), ZoneId.systemDefault())
-    val today = LocalDate.now()
-    return when (dateTime.toLocalDate()) {
-        today -> "Today"
-        today.minusDays(1) -> "Yesterday"
-        else -> dateTime.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
-    }
-}
-
-fun formatDate(date: Date): String {
-    val calendar = Calendar.getInstance()
-    val today = calendar.time
-
-    calendar.add(Calendar.DATE, -1)
-    val yesterday = calendar.time
-
-    val dayDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val formattedDate = dayDateFormat.format(date)
-
-    return when (formattedDate) {
-        dayDateFormat.format(today) -> "Today"
-        dayDateFormat.format(yesterday) -> "Yesterday"
-        else -> SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(date)
     }
 }
 
