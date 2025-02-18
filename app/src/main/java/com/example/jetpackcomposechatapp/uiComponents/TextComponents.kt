@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamily
 
 @Composable
@@ -193,6 +194,27 @@ fun LabelLargeComponent(
 }
 
 @Composable
+fun LabelLargeComponentSingleLine(
+    textValue: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    fontFamily: FontFamily = interFontFamily,
+    textAlign: TextAlign = TextAlign.Center,
+    overflow: TextOverflow = TextOverflow.Clip
+) {
+    Text(
+        text = textValue,
+        style = MaterialTheme.typography.labelLarge,
+        modifier = modifier,
+        color = color,
+        textAlign = textAlign,
+        fontFamily = fontFamily,
+        overflow = overflow,
+        maxLines = 1
+    )
+}
+
+@Composable
 fun LabelMediumComponent(
     textValue: String,
     modifier: Modifier = Modifier,
@@ -211,6 +233,27 @@ fun LabelMediumComponent(
 }
 
 @Composable
+fun LabelMediumComponentSingleLine(
+    textValue: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    fontFamily: FontFamily = interFontFamily,
+    textAlign: TextAlign = TextAlign.Center,
+    overflow: TextOverflow = TextOverflow.Clip
+) {
+    Text(
+        text = textValue,
+        style = MaterialTheme.typography.labelMedium,
+        modifier = modifier,
+        color = color,
+        textAlign = textAlign,
+        fontFamily = fontFamily,
+        overflow = overflow,
+        maxLines = 1
+    )
+}
+
+@Composable
 fun LabelSmallComponent(
     textValue: String,
     modifier: Modifier = Modifier,
@@ -225,5 +268,27 @@ fun LabelSmallComponent(
         color = color,
         textAlign = textAlign,
         fontFamily = fontFamily
+    )
+}
+
+
+@Composable
+fun LabelSmallComponentSingleLine(
+    textValue: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    fontFamily: FontFamily = interFontFamily,
+    textAlign: TextAlign = TextAlign.Center,
+    overflow: TextOverflow = TextOverflow.Clip
+) {
+    Text(
+        text = textValue,
+        style = MaterialTheme.typography.labelSmall,
+        modifier = modifier,
+        color = color,
+        textAlign = textAlign,
+        fontFamily = fontFamily,
+        overflow = overflow,
+        maxLines = 1
     )
 }

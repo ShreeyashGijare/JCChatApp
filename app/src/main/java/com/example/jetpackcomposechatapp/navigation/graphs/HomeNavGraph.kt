@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.jetpackcomposechatapp.data.userData.UserData
+import com.example.jetpackcomposechatapp.ui.mainContent.screens.CaptureImageScreen
 import com.example.jetpackcomposechatapp.ui.mainContent.screens.ChatListScreen
 import com.example.jetpackcomposechatapp.ui.mainContent.screens.ChatScreen
 import com.example.jetpackcomposechatapp.ui.mainContent.screens.ContactsScreen
@@ -137,5 +138,25 @@ fun HomeNavGraph(
                 Gson().fromJson(it.arguments?.getString("userData"), UserData::class.java)
             ChatScreen(homeNavController = homeNavController, userData = userData)
         }
+
+        /*composable(
+            HomeRouteScreen.CaptureImageScreen.route,
+            enterTransition = {
+                fadeIn(
+                    initialAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    targetAlpha = 0.3f,
+                    animationSpec = tween(durationMillis = 100)
+                )
+            }
+        ) {
+            CaptureImageScreen()
+        }*/
+
+
     }
 }

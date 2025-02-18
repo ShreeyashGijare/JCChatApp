@@ -1,6 +1,8 @@
 package com.example.jetpackcomposechatapp.ui.mainContent.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -24,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -43,6 +46,8 @@ fun MainScreen(
     rootNavController: NavHostController,
     homeNavController: NavHostController = rememberNavController()
 ) {
+
+    val context = LocalContext.current
     val navBackStackEntry by homeNavController.currentBackStackEntryAsState()
     val currentRoute by remember(navBackStackEntry) {
         derivedStateOf {
@@ -60,64 +65,47 @@ fun MainScreen(
 
     Scaffold(
         bottomBar = {
-            if (bottomAppBarVisible)
-                /*BottomNavigationBar(
+            bottomNavigationItemList.find { it.route == currentRoute }?.let {
+                JumpingBottomBar(
                     items = bottomNavigationItemList,
-                    currentRoute = currentRoute
-                ) { currentNavigationItem ->
-                    homeNavController.navigate(currentNavigationItem.route) {
-                        homeNavController.graph.startDestinationRoute?.let { startDestinationRoute ->
-                            popUpTo(startDestinationRoute) {
-                                saveState = true
-                            }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }*/
-
-                bottomNavigationItemList.find { it.route == currentRoute }?.let {
-                    JumpingBottomBar(
-                        items = bottomNavigationItemList,
-                        selected = it,
-                        onJump = { currentNavigationItem ->
-                            homeNavController.navigate(currentNavigationItem.route) {
-                                homeNavController.graph.startDestinationRoute?.let { startDestinationRoute ->
-                                    popUpTo(startDestinationRoute) {
-                                        saveState = true
-                                    }
+                    selected = it,
+                    onJump = { currentNavigationItem ->
+                        homeNavController.navigate(currentNavigationItem.route) {
+                            homeNavController.graph.startDestinationRoute?.let { startDestinationRoute ->
+                                popUpTo(startDestinationRoute) {
+                                    saveState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                    )
-                }
+                    }
+                )
+            }
 
             if (!currentRoute.isNullOrEmpty()) {
                 bottomAppBarVisible = currentRoute == HomeRouteScreen.ChatListScreen.route ||
                         currentRoute == HomeRouteScreen.StatusListScreen.route ||
                         currentRoute == HomeRouteScreen.ProfileScreen.route
-
-                isFloatingButtonVisible =
-                    currentRoute == HomeRouteScreen.StatusListScreen.route
             }
+
+            isFloatingButtonVisible =
+                currentRoute == HomeRouteScreen.StatusListScreen.route
         },
         floatingActionButton = {
-            if (!currentRoute.isNullOrEmpty()) {
-                if (currentRoute == HomeRouteScreen.ChatListScreen.route) {
-                    ExtendedFloatingButtonComponent(
-                        icon = Icons.Filled.PersonAdd,
-                        buttonText = R.string.add_chat
-                    ) {
-                        bottomAppBarVisible = !bottomAppBarVisible
-                        homeNavController.navigate(HomeRouteScreen.ContactsScreen.route)
-                    }
-                } else if (currentRoute == HomeRouteScreen.StatusListScreen.route) {
+            currentRoute?.let { currentRoute ->
+                if (currentRoute == HomeRouteScreen.ChatListScreen.route || currentRoute == HomeRouteScreen.StatusListScreen.route) {
                     UpdatesScreenFloatingButtons(
+                        currentRoute = currentRoute,
                         isVisible = isFloatingButtonVisible,
                         onPrimaryButtonClick = {
-
+                            if (currentRoute == HomeRouteScreen.ChatListScreen.route) {
+                                bottomAppBarVisible = !bottomAppBarVisible
+                                homeNavController.navigate(HomeRouteScreen.ContactsScreen.route)
+                            } else {
+                                Toast.makeText(context, "Working correctly", Toast.LENGTH_LONG)
+                                    .show()
+                            }
                         },
                         onSecondaryButtonClick = {
 
@@ -146,9 +134,10 @@ fun MainScreen(
 
 @Composable
 fun UpdatesScreenFloatingButtons(
+    currentRoute: String,
     isVisible: Boolean,
     onPrimaryButtonClick: () -> Unit,
-    onSecondaryButtonClick: () -> Unit,
+    onSecondaryButtonClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.End
@@ -158,8 +147,8 @@ fun UpdatesScreenFloatingButtons(
         }
         Spacer(modifier = Modifier.height(10.dp))
         ExtendedFloatingButtonComponent(
-            icon = Icons.Filled.Update,
-            buttonText = R.string.add_update
+            icon = if (currentRoute == HomeRouteScreen.StatusListScreen.route) Icons.Filled.Update else Icons.Filled.PersonAdd,
+            buttonText = if (currentRoute == HomeRouteScreen.StatusListScreen.route) R.string.add_update else R.string.add_chat
         ) {
             onPrimaryButtonClick()
         }
@@ -187,6 +176,3 @@ fun AnimatedTextUpdateButton(
         }
     }
 }
-
-
-

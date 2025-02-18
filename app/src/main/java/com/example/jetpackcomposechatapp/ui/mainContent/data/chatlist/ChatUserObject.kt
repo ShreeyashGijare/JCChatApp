@@ -11,5 +11,6 @@ data class ChatUserObject(
     val number: String? = "",
     val userId: String? = "",
     val emailId: String? = "",
-    val timeStamp: Long = Calendar.getInstance().timeInMillis
+    val timeStamp: Long = Calendar.getInstance().timeInMillis,
+    val lastMessage: String = ""
 ): Parcelable

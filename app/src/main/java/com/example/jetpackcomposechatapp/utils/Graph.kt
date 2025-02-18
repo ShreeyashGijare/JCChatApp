@@ -23,5 +23,7 @@ sealed class HomeRouteScreen(val route: String) {
     object ContactsScreen : HomeRouteScreen("Contacts")
     object ChatScreen : HomeRouteScreen("Chat/{userData}")
 
+    object CaptureImageScreen: HomeRouteScreen("CaptureImage")
+
 
 }

@@ -7,6 +7,8 @@ import java.util.Locale
 
 object DateUtils {
 
+    const val DATE_FORMAT: String = "yyyy-MM-dd"
+
     fun convertLongToTimeAMPM(time: Long): String {
         val date = Date(time)
         val format = SimpleDateFormat("hh:mm", Locale.getDefault())
@@ -20,13 +22,13 @@ object DateUtils {
         calendar.add(Calendar.DATE, -1)
         val yesterday = calendar.time
 
-        val dayDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val dayDateFormat = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
         val formattedDate = dayDateFormat.format(date)
 
         return when (formattedDate) {
             dayDateFormat.format(today) -> "Today"
             dayDateFormat.format(yesterday) -> "Yesterday"
-            else -> SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(date)
+            else -> SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
         }
     }
 
@@ -40,7 +42,7 @@ object DateUtils {
         return when (dateObject) {
             dateFormat.format(today) -> convertLongToTimeAMPM(messageTime)
             dateFormat.format(yesterday) -> "Yesterday"
-            else -> SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(dateObject)
+            else -> SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(dateFormat.parse(dateObject))
         }
     }
 }

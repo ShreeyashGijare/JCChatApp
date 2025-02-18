@@ -1,11 +1,13 @@
 package com.example.jetpackcomposechatapp.ui.mainContent.viewModel
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
+import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.MessageType
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chatlist.ChatUserObject
 import com.example.jetpackcomposechatapp.utils.Constants
 import com.example.jetpackcomposechatapp.utils.Constants.CHAT_LIST_NODE
@@ -16,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val auth: FirebaseAuth,
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val storage: FirebaseStorage
 ) : ViewModel() {
 
 
@@ -98,15 +102,55 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(message: String) {
+    fun onEvents(event: ChatEvents) {
+
+        when (event) {
+            is ChatEvents.Message -> {
+                sendMessage(message = event.message, messageType = event.messageType)
+            }
+
+            is ChatEvents.UploadImage -> {
+                uploadChatImage(
+                    event.image
+                ) { imagePath ->
+                    sendMessage(
+                        message = "Shreeyash",
+                        messageType = event.messageType
+                    )
+
+
+                    Log.i("UploadImageToFirebase", "Upload Success")
+                }
+            }
+        }
+    }
+
+    private fun uploadChatImage(image: Uri, imageUploadSuccess: (String) -> Unit) {
+        val imageRef = storage.reference.child("chatImages/${System.currentTimeMillis()}")
+        if (image.path != "") {
+            imageRef.putFile(image)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl
+                        .addOnSuccessListener { firebaseImageUri ->
+                            imageUploadSuccess.invoke(firebaseImageUri.toString())
+                        }
+                }.addOnFailureListener {
+                    Log.i("UploadImageToFirebase", "Upload Failed")
+                }
+        } else {
+            Log.i("UploadImageToFirebase", "Empty Image")
+        }
+    }
+
+
+    private fun sendMessage(message: String, messageType: MessageType) {
 
         val currentUserListObject = ChatUserObject(
             imageUrl = currentUser?.imageUrl,
             name = currentUser?.name,
             number = currentUser?.number,
             emailId = currentUser?.emailId,
-            userId = currentUser?.userId/*,
-            timeStamp = Calendar.getInstance().timeInMillis*/
+            userId = currentUser?.userId
         )
 
         val receiverUserListObject = ChatUserObject(
@@ -114,23 +158,17 @@ class ChatViewModel @Inject constructor(
             name = _receiverUser.value.name,
             number = _receiverUser.value.number,
             emailId = _receiverUser.value.emailId,
-            userId = _receiverUser.value.userId/*,
-            timeStamp = Calendar.getInstance().timeInMillis*/
+            userId = _receiverUser.value.userId
         )
 
         _chatState.value = _chatState.value.copy(
             message = message,
             timeStamp = Calendar.getInstance().timeInMillis,
             senderId = auth.currentUser?.uid!!,
-            receiverId = _receiverUser.value.userId!!
+            receiverId = _receiverUser.value.userId!!,
+            messageType = messageType
         )
 
-
-        //check receiver user exists in sender chat list and update
-        /*db.collection(CHAT_LIST_NODE).document(auth.currentUser?.uid!!)
-            .collection(CHAT_LIST_USER_NODE)
-            .document(receiverUser?.userId!!)
-            .set(receiverUserListObject)*/
         val receiverUserObjectRef = db.collection(CHAT_LIST_NODE).document(auth.currentUser?.uid!!)
             .collection(CHAT_LIST_USER_NODE)
             .document(_receiverUser.value.userId!!)
@@ -140,23 +178,30 @@ class ChatViewModel @Inject constructor(
                 receiverUserObjectRef.set(receiverUserListObject)
             } else {
                 Log.i("ChatMessage-receiver", " -->  Exists")
-                receiverUserObjectRef.set(receiverUserListObject.copy(timeStamp = Calendar.getInstance().timeInMillis))
+                receiverUserObjectRef.set(
+                    receiverUserListObject.copy(
+                        timeStamp = Calendar.getInstance().timeInMillis,
+                        lastMessage = message
+                    )
+                )
             }
         }
 
-        //check sender user exists in receiver chat list and update
-        /*db.collection(CHAT_LIST_NODE).document(receiverUser?.userId!!)
-            .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
-            .set(currentUserListObject)*/
-        val senderUserObjectRef = db.collection(CHAT_LIST_NODE).document(_receiverUser.value.userId!!)
-            .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
+        val senderUserObjectRef =
+            db.collection(CHAT_LIST_NODE).document(_receiverUser.value.userId!!)
+                .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
 
         senderUserObjectRef.get().addOnSuccessListener {
             if (!it.exists()) {
                 senderUserObjectRef.set(currentUserListObject)
             } else {
                 Log.i("ChatMessage-sender", " -->  Exists")
-                senderUserObjectRef.set(currentUserListObject.copy(timeStamp = Calendar.getInstance().timeInMillis))
+                senderUserObjectRef.set(
+                    currentUserListObject.copy(
+                        timeStamp = Calendar.getInstance().timeInMillis,
+                        lastMessage = message
+                    )
+                )
             }
         }
 
@@ -170,4 +215,11 @@ class ChatViewModel @Inject constructor(
     private fun generateChatId(senderId: String, receiverId: String): String {
         return if (senderId < receiverId) "$senderId-$receiverId" else "$receiverId-$senderId"
     }
+}
+
+
+sealed class ChatEvents {
+
+    data class UploadImage(val image: Uri, val messageType: MessageType) : ChatEvents()
+    data class Message(val message: String, val messageType: MessageType) : ChatEvents()
 }

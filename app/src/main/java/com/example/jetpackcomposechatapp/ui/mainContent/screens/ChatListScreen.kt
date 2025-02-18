@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,9 +55,15 @@ import com.example.jetpackcomposechatapp.ui.mainContent.data.chatlist.ChatUserOb
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatListViewModel
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyBold
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
+import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
+import com.example.jetpackcomposechatapp.uiComponents.BodyMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.BodySmallComponent
+import com.example.jetpackcomposechatapp.uiComponents.DisplayMediumComponent
+import com.example.jetpackcomposechatapp.uiComponents.HeadLineSmallComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelLargeComponent
+import com.example.jetpackcomposechatapp.uiComponents.LabelMediumComponentSingleLine
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
+import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponentSingleLine
 import com.example.jetpackcomposechatapp.utils.DateUtils.formatMessageTimeStampToDate
 import com.example.jetpackcomposechatapp.utils.Graph
 import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
@@ -127,7 +135,7 @@ fun ChatListScreen(
             contentPadding = PaddingValues(15.dp)
         ) {
 
-            items(chatList) { userData ->
+            itemsIndexed(chatList) { index, userData ->
                 UserChatItem(user = userData) {
                     homeNavController.navigate(
                         "${HomeRouteScreen.ChatScreen.route}?userData=${
@@ -137,8 +145,16 @@ fun ChatListScreen(
                         }"
                     )
                 }
+                if (index != chatList.indices.last) {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(MaterialTheme.colorScheme.onSecondaryContainer)
+                            .padding(horizontal = 5.dp)
+                    )
+                }
             }
-
         }
     }
 
@@ -251,7 +267,7 @@ fun UserChatItem(
                 )
                 onClick.invoke(userData)
             }
-            .padding(vertical = 5.dp)
+            .padding(vertical = 8.dp)
 
     ) {
         Image(
@@ -266,23 +282,27 @@ fun UserChatItem(
             contentScale = ContentScale.FillBounds
         )
         Column(
-            modifier = Modifier.padding(start = 15.dp)
+            modifier = Modifier
+                .padding(start = 15.dp)
+                .weight(1f)
         ) {
-            LabelLargeComponent(
+            BodyMediumComponent(
                 textValue = user.name!!,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground,
+                fontFamily = interFontFamilySemiBold
             )
-            LabelSmallComponent(
-                textValue = user.number!!,
-                color = MaterialTheme.colorScheme.onBackground
+            Spacer(modifier = Modifier.height(5.dp))
+            LabelMediumComponentSingleLine(
+                textValue = user.lastMessage,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Start,
+                overflow = TextOverflow.Ellipsis
             )
         }
         //Add unread messages count here
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(.1f))
         LabelSmallComponent(textValue = formatMessageTimeStampToDate(user.timeStamp))
     }
-
-
 }
 
 
