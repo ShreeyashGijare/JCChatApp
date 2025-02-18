@@ -1,6 +1,7 @@
 package com.example.jetpackcomposechatapp.ui.mainContent.data.chatlist
 
 import android.os.Parcelable
+import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.MessageType
 import kotlinx.parcelize.Parcelize
 import java.util.Calendar
 
@@ -12,5 +13,6 @@ data class ChatUserObject(
     val userId: String? = "",
     val emailId: String? = "",
     val timeStamp: Long = Calendar.getInstance().timeInMillis,
-    val lastMessage: String = ""
+    val lastMessage: String = "",
+    val lastMessageType: MessageType = MessageType.MESSAGE
 ): Parcelable

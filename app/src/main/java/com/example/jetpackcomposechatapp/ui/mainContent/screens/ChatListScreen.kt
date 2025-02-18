@@ -38,9 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -51,6 +53,7 @@ import coil.compose.rememberImagePainter
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.navigation.navigateUpTo
+import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.MessageType
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chatlist.ChatUserObject
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatListViewModel
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyBold
@@ -292,12 +295,38 @@ fun UserChatItem(
                 fontFamily = interFontFamilySemiBold
             )
             Spacer(modifier = Modifier.height(5.dp))
-            LabelMediumComponentSingleLine(
-                textValue = user.lastMessage,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Start,
-                overflow = TextOverflow.Ellipsis
-            )
+
+            when (user.lastMessageType) {
+                MessageType.MESSAGE -> {
+                    LabelMediumComponentSingleLine(
+                        textValue = user.lastMessage,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Start,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                MessageType.IMAGE -> {
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(width = 30.dp, height = 18.dp),
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_image),
+                            contentDescription = "Image",
+                            tint = Color.Unspecified
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        LabelMediumComponentSingleLine(
+                            textValue = "Photo",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Start,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
         }
         //Add unread messages count here
         Spacer(modifier = Modifier.weight(.1f))

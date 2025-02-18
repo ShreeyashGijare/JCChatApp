@@ -114,12 +114,9 @@ class ChatViewModel @Inject constructor(
                     event.image
                 ) { imagePath ->
                     sendMessage(
-                        message = "Shreeyash",
+                        message = imagePath,
                         messageType = event.messageType
                     )
-
-
-                    Log.i("UploadImageToFirebase", "Upload Success")
                 }
             }
         }
@@ -150,7 +147,7 @@ class ChatViewModel @Inject constructor(
             name = currentUser?.name,
             number = currentUser?.number,
             emailId = currentUser?.emailId,
-            userId = currentUser?.userId
+            userId = currentUser?.userId,
         )
 
         val receiverUserListObject = ChatUserObject(
@@ -181,7 +178,8 @@ class ChatViewModel @Inject constructor(
                 receiverUserObjectRef.set(
                     receiverUserListObject.copy(
                         timeStamp = Calendar.getInstance().timeInMillis,
-                        lastMessage = message
+                        lastMessage = message,
+                        lastMessageType = messageType
                     )
                 )
             }
@@ -199,7 +197,8 @@ class ChatViewModel @Inject constructor(
                 senderUserObjectRef.set(
                     currentUserListObject.copy(
                         timeStamp = Calendar.getInstance().timeInMillis,
-                        lastMessage = message
+                        lastMessage = message,
+                        lastMessageType = messageType
                     )
                 )
             }

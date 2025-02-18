@@ -11,7 +11,7 @@ object DateUtils {
 
     fun convertLongToTimeAMPM(time: Long): String {
         val date = Date(time)
-        val format = SimpleDateFormat("hh:mm", Locale.getDefault())
+        val format = SimpleDateFormat("HH:mm", Locale.getDefault())
         return format.format(date)
     }
 

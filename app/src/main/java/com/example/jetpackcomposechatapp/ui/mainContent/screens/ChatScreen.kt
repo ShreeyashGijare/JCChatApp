@@ -104,6 +104,42 @@ fun ChatScreen(
     val chatMessages by viewModel.chatMessages.collectAsState()
     val receiverUser by viewModel.receiverUser.collectAsState()
 
+
+    //Send image permission, capture image functionality starts here
+
+    val context = LocalContext.current
+    var imageBitmap by remember { mutableStateOf<Uri?>(null) }
+
+    // Camera intent launcher
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            imageBitmap = getUriFromBitmap(result.data?.extras?.get("data") as Bitmap, context)
+            imageBitmap?.let { imageUri ->
+                val outputStream = ByteArrayOutputStream()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && imageUri.toString() != "") {
+                    val src = ImageDecoder.createSource(context.contentResolver, imageUri)
+                    val bitmap = ImageDecoder.decodeBitmap(src)
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                }
+                viewModel.onEvents(ChatEvents.UploadImage(imageUri, MessageType.IMAGE))
+            }
+        }
+    }
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            cameraLauncher.launch(cameraIntent)
+        } else {
+            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+    //Send image permission, capture image functionality ends here
+
+
     LaunchedEffect(key1 = Unit) {
         viewModel.setReceiverUser(userData)
     }
@@ -162,8 +198,19 @@ fun ChatScreen(
             onSendButtonClick = { message ->
                 viewModel.onEvents(ChatEvents.Message(message, MessageType.MESSAGE))
             },
-            onSendImageClick = { imageUri ->
-                viewModel.onEvents(ChatEvents.UploadImage(imageUri, MessageType.IMAGE))
+            onSendImageClick = {
+                /*val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                cameraLauncher.launch(cameraIntent)*/
+
+                when (PackageManager.PERMISSION_GRANTED) {
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        cameraLauncher.launch(cameraIntent)
+                    }
+
+                    else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+
             }
         )
     }
@@ -256,17 +303,51 @@ fun MessageItem(message: ChatState) {
         }
 
         MessageType.IMAGE -> {
-            Image(
-                painter = if (!message.message.isNullOrBlank()) rememberImagePainter(data = message.message) else painterResource(
-                    id = R.drawable.ic_profile
-                ), contentDescription = "",
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(
-                        CircleShape
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Arrangement.End else Arrangement.Start
+            ) {
+                Card(
+                    colors = CardColors(
+                        containerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onPrimary,
+                        contentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onBackground,
+                        disabledContainerColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
                     ),
-                contentScale = ContentScale.FillBounds
-            )
+                    modifier = Modifier
+                        .widthIn(20.dp, 300.dp)
+                        .padding(8.dp),
+                    shape = RoundedCornerShape(
+                        topStart = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 15.dp else 0.dp,
+                        topEnd = 15.dp,
+                        bottomEnd = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 0.dp else 15.dp,
+                        bottomStart = 15.dp
+                    )
+                ) {
+                    Column(
+                        horizontalAlignment = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Alignment.End else Alignment.Start,
+                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 6.dp)
+                    ) {
+                        Image(
+                            painter = if (!message.message.isNullOrBlank()) rememberImagePainter(
+                                data = message.message
+                            ) else painterResource(
+                                id = R.drawable.ic_profile
+                            ), contentDescription = "",
+                            modifier = Modifier
+                                .size(width = 250.dp, height = 350.dp)
+                                .clip(RoundedCornerShape(14.dp)),
+                            contentScale = ContentScale.FillBounds
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = convertLongToTimeAMPM(message.timeStamp),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -275,7 +356,7 @@ fun MessageItem(message: ChatState) {
 fun ChatScreenBottomBar(
     homeNavController: NavController,
     onSendButtonClick: (String) -> Unit,
-    onSendImageClick: (Uri) -> Unit
+    onSendImageClick: () -> Unit
 ) {
     var message by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -342,9 +423,7 @@ fun ChatScreenBottomBar(
 
         IconButton(
             onClick = {
-                /*CaptureImageScreen {
-                    onSendImageClick.invoke(it)
-                }*/
+                onSendImageClick.invoke()
             }
         ) {
             Icon(
