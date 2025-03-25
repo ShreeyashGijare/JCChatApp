@@ -135,7 +135,7 @@ fun ChatListScreen(
                 .fillMaxSize()
                 .weight(1f)
                 .background(MaterialTheme.colorScheme.background),
-            contentPadding = PaddingValues(15.dp)
+            /*contentPadding = PaddingValues(vertical = 8.dp)*/
         ) {
 
             itemsIndexed(chatList) { index, userData ->
@@ -270,7 +270,7 @@ fun UserChatItem(
                 )
                 onClick.invoke(userData)
             }
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp, horizontal = 15.dp)
 
     ) {
         Image(

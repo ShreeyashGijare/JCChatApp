@@ -211,11 +211,14 @@ class ChatViewModel @Inject constructor(
             .add(_chatState.value)
     }
 
+    private fun addReaction() {
+
+    }
+
     private fun generateChatId(senderId: String, receiverId: String): String {
         return if (senderId < receiverId) "$senderId-$receiverId" else "$receiverId-$senderId"
     }
 }
-
 
 sealed class ChatEvents {
 
