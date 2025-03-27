@@ -15,6 +15,7 @@ import com.example.jetpackcomposechatapp.utils.Constants.CHAT_LIST_USER_NODE
 import com.example.jetpackcomposechatapp.utils.Constants.CHAT_MESSAGES
 import com.example.jetpackcomposechatapp.utils.Constants.MESSAGES
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -119,6 +121,13 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
+
+            is ChatEvents.Reaction -> {
+                addReaction(
+                    messageId = event.messageId,
+                    reaction = event.reaction
+                )
+            }
         }
     }
 
@@ -159,6 +168,7 @@ class ChatViewModel @Inject constructor(
         )
 
         _chatState.value = _chatState.value.copy(
+            messageId = UUID.randomUUID().toString().substring(0, 15),
             message = message,
             timeStamp = Calendar.getInstance().timeInMillis,
             senderId = auth.currentUser?.uid!!,
@@ -208,11 +218,31 @@ class ChatViewModel @Inject constructor(
         db.collection(CHAT_MESSAGES)
             .document(generateChatId(auth.currentUser?.uid!!, _receiverUser.value.userId!!))
             .collection(MESSAGES)
-            .add(_chatState.value)
+            .document(_chatState.value.messageId).set(_chatState.value)
     }
 
-    private fun addReaction() {
-
+    private fun addReaction(messageId: String, reaction: String) {
+        db.collection(CHAT_MESSAGES)
+            .document(generateChatId(auth.currentUser?.uid!!, _receiverUser.value.userId!!))
+            .collection(MESSAGES)
+            .document(messageId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    document.reference.update(
+                        "messageReactions",
+                        FieldValue.arrayUnion(reaction)
+                    )
+                        .addOnSuccessListener {
+                            Log.d("Chat-Reaction", "Reaction added successfully")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Chat-Reaction", e.message.toString())
+                        }
+                }
+            }.addOnFailureListener { e ->
+                Log.d("Chat-Reaction", e.message.toString())
+            }
     }
 
     private fun generateChatId(senderId: String, receiverId: String): String {
@@ -224,4 +254,7 @@ sealed class ChatEvents {
 
     data class UploadImage(val image: Uri, val messageType: MessageType) : ChatEvents()
     data class Message(val message: String, val messageType: MessageType) : ChatEvents()
+    data class Reaction(val messageId: String, val reaction: String) :
+        ChatEvents()
+
 }
