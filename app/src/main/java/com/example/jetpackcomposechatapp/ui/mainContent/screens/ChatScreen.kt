@@ -190,6 +190,7 @@ fun ChatScreen(
                         MessageItem(
                             index = index,
                             message = dayMessage.message,
+                            receiverUser = receiverUser,
                             showReactions = index == currentSelectedMessageIndex,
                             onLongClick = {
                                 currentSelectedMessageIndex = it
@@ -201,6 +202,9 @@ fun ChatScreen(
                                         reaction = selectedReaction
                                     )
                                 )
+                            },
+                            onReactionRemoved = {
+                                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                             }
                         )
                     }

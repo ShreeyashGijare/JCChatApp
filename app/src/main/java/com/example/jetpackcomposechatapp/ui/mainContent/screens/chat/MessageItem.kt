@@ -19,7 +19,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -34,10 +39,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.jetpackcomposechatapp.R
+import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.MessageType
+import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
+import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
 import com.example.jetpackcomposechatapp.utils.DateUtils
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -47,9 +56,11 @@ import com.google.firebase.ktx.Firebase
 fun MessageItem(
     index: Int,
     message: ChatState,
+    receiverUser: UserData,
     showReactions: Boolean,
     onLongClick: (Int) -> Unit,
-    onReactionSelected: (String) -> Unit
+    onReactionSelected: (String) -> Unit,
+    onReactionRemoved: (Int) -> Unit
 ) {
     Box(
         contentAlignment = Alignment.BottomEnd,
@@ -69,7 +80,7 @@ fun MessageItem(
                             disabledContentColor = Color.Transparent,
                         ),
                         modifier = Modifier
-                            .widthIn(20.dp, 300.dp)
+                            .widthIn(100.dp, 300.dp)
                             .combinedClickable(
                                 onClick = {
 
@@ -90,21 +101,59 @@ fun MessageItem(
                             horizontalAlignment = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Alignment.End else Alignment.Start,
                             modifier = Modifier.padding(vertical = 10.dp, horizontal = 16.dp)
                         ) {
+                            Row(
+                                modifier = Modifier
+                                    .widthIn(100.dp, 300.dp)
+                                    .wrapContentSize()
+                                    .wrapContentHeight(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .wrapContentWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = if (!receiverUser.imageUrl.isNullOrBlank()) rememberImagePainter(
+                                            data = receiverUser.imageUrl
+                                        ) else painterResource(
+                                            id = R.drawable.ic_profile
+                                        ), contentDescription = "",
+                                        modifier = Modifier
+                                            .size(20.dp)
+                                            .clip(
+                                                CircleShape
+                                            ),
+                                        contentScale = ContentScale.FillBounds
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    LabelSmallComponent(
+                                        textValue = receiverUser.name!!,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = DateUtils.convertLongToTimeAMPM(message.timeStamp),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
                             Text(
                                 text = message.message.toString(),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = DateUtils.convertLongToTimeAMPM(message.timeStamp),
-                                style = MaterialTheme.typography.labelSmall
-                            )
                         }
                     }
                 }
                 MessageReactions(
                     reactions = message.messageReactions,
-                    arrangement = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Arrangement.End else Arrangement.Start
+                    arrangement = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Arrangement.End else Arrangement.Start,
+                    onReactionRemoved = {
+                        onReactionRemoved.invoke(it)
+                    }
                 )
             }
 
@@ -143,8 +192,8 @@ fun MessageItem(
                             modifier = Modifier.padding(vertical = 4.dp, horizontal = 6.dp)
                         ) {
                             Image(
-                                painter = if (!message.message.isNullOrBlank()) rememberImagePainter(
-                                    data = message.message
+                                painter = if (!message.message.isNullOrBlank()) rememberAsyncImagePainter(
+                                    model = message.message
                                 ) else painterResource(
                                     id = R.drawable.ic_profile
                                 ), contentDescription = "",
@@ -163,7 +212,10 @@ fun MessageItem(
                 }
                 MessageReactions(
                     reactions = message.messageReactions,
-                    arrangement = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Arrangement.End else Arrangement.Start
+                    arrangement = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Arrangement.End else Arrangement.Start,
+                    onReactionRemoved = {
+                        onReactionRemoved.invoke(it)
+                    }
                 )
             }
         }
@@ -208,7 +260,11 @@ fun ReactionPicker(
 
 
 @Composable
-fun MessageReactions(arrangement: Arrangement.Horizontal, reactions: List<String>) {
+fun MessageReactions(
+    arrangement: Arrangement.Horizontal,
+    reactions: List<String>,
+    onReactionRemoved: (Int) -> Unit
+) {
     Row(
         horizontalArrangement = arrangement,
         modifier = Modifier.fillMaxWidth()
@@ -218,16 +274,17 @@ fun MessageReactions(arrangement: Arrangement.Horizontal, reactions: List<String
                 .background(Color.White, shape = RoundedCornerShape(16.dp))
                 .padding(2.dp)
         ) {
-            reactions.forEach { emoji ->
+            reactions.forEachIndexed { index, emoji ->
                 Text(
                     text = emoji,
                     fontSize = 14.sp,
                     modifier = Modifier
                         .padding(4.dp)
+                        .clickable {
+                            onReactionRemoved.invoke(index)
+                        }
                 )
             }
         }
     }
-
-
 }
