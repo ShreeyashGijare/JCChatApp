@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
@@ -197,14 +198,19 @@ fun ChatScreen(
                             },
                             onReactionSelected = { selectedReaction ->
                                 viewModel.onEvents(
-                                    ChatEvents.Reaction(
+                                    ChatEvents.AddReaction(
                                         messageId = dayMessage.message.messageId,
                                         reaction = selectedReaction
                                     )
                                 )
                             },
-                            onReactionRemoved = {
-                                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                            onReactionRemoved = { reactionIndex ->
+                                viewModel.onEvents(
+                                    ChatEvents.RemoveReaction(
+                                        messageId = dayMessage.message.messageId,
+                                        reaction = dayMessage.message.messageReactions[reactionIndex]
+                                    )
+                                )
                             }
                         )
                     }
@@ -213,21 +219,19 @@ fun ChatScreen(
 
         }
         ChatScreenBottomBar(
-            homeNavController = homeNavController,
             onSendButtonClick = { message ->
                 viewModel.onEvents(ChatEvents.Message(message, MessageType.MESSAGE))
-            },
-            onSendImageClick = {
-                when (PackageManager.PERMISSION_GRANTED) {
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
-                        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        cameraLauncher.launch(cameraIntent)
-                    }
-
-                    else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-                }
             }
-        )
+        ) {
+            when (PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    cameraLauncher.launch(cameraIntent)
+                }
+
+                else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
     }
 }
 
@@ -254,7 +258,7 @@ fun ChatScreenTopBar(
                 }
         )
         Image(
-            painter = if (!userData.imageUrl.isNullOrBlank()) rememberImagePainter(data = userData.imageUrl) else painterResource(
+            painter = if (!userData.imageUrl.isNullOrBlank()) rememberAsyncImagePainter(model = userData.imageUrl) else painterResource(
                 id = R.drawable.ic_profile
             ), contentDescription = "",
             modifier = Modifier
@@ -276,7 +280,6 @@ fun ChatScreenTopBar(
 
 @Composable
 fun ChatScreenBottomBar(
-    homeNavController: NavController,
     onSendButtonClick: (String) -> Unit,
     onSendImageClick: () -> Unit
 ) {
@@ -430,7 +433,7 @@ fun CaptureImageScreen(
     ) {
         imageBitmap?.let { image ->
             Image(
-                painter = rememberImagePainter(data = image),
+                painter = rememberAsyncImagePainter(model = image),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize()
             )

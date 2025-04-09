@@ -21,6 +21,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -122,8 +123,15 @@ class ChatViewModel @Inject constructor(
                 }
             }
 
-            is ChatEvents.Reaction -> {
+            is ChatEvents.AddReaction -> {
                 addReaction(
+                    messageId = event.messageId,
+                    reaction = event.reaction
+                )
+            }
+
+            is ChatEvents.RemoveReaction -> {
+                removeReaction(
                     messageId = event.messageId,
                     reaction = event.reaction
                 )
@@ -244,6 +252,31 @@ class ChatViewModel @Inject constructor(
                 Log.d("Chat-Reaction", e.message.toString())
             }
     }
+    private fun removeReaction(messageId: String, reaction: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.collection(CHAT_MESSAGES)
+                .document(generateChatId(auth.currentUser?.uid!!, _receiverUser.value.userId!!))
+                .collection(MESSAGES)
+                .document(messageId)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        document.reference.update(
+                            "messageReactions",
+                            FieldValue.arrayRemove(reaction)
+                        )
+                            .addOnSuccessListener {
+                                Log.d("Chat-Reaction", "Reaction removed successfully")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Chat-Reaction", e.message.toString())
+                            }
+                    }
+                }.addOnFailureListener { e ->
+                    Log.d("Chat-Reaction", e.message.toString())
+                }
+        }
+    }
 
     private fun generateChatId(senderId: String, receiverId: String): String {
         return if (senderId < receiverId) "$senderId-$receiverId" else "$receiverId-$senderId"
@@ -251,10 +284,13 @@ class ChatViewModel @Inject constructor(
 }
 
 sealed class ChatEvents {
-
     data class UploadImage(val image: Uri, val messageType: MessageType) : ChatEvents()
+
     data class Message(val message: String, val messageType: MessageType) : ChatEvents()
-    data class Reaction(val messageId: String, val reaction: String) :
+
+    data class AddReaction(val messageId: String, val reaction: String) :
         ChatEvents()
 
+    data class RemoveReaction(val messageId: String, val reaction: String) :
+        ChatEvents()
 }
