@@ -108,8 +108,8 @@ fun MessageItem(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Image(
-                                    painter = if (!receiverUser.imageUrl.isNullOrBlank()) rememberImagePainter(
-                                        data = receiverUser.imageUrl
+                                    painter = if (!receiverUser.imageUrl.isNullOrBlank()) rememberAsyncImagePainter(
+                                        model = receiverUser.imageUrl
                                     ) else painterResource(
                                         id = R.drawable.ic_profile
                                     ), contentDescription = "",
@@ -175,7 +175,94 @@ fun MessageItem(
             }
 
             MessageType.IMAGE -> {
-                Row(
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    contentAlignment = messageArrangement
+                ) {
+
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                messageColor, shape = RoundedCornerShape(
+                                    topStart = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 10.dp else 0.dp,
+                                    topEnd = 10.dp,
+                                    bottomEnd = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 0.dp else 10.dp,
+                                    bottomStart = 10.dp
+                                )
+                            )
+                            .combinedClickable(
+                                onClick = {
+
+                                },
+                                onLongClick = {
+                                    onLongClick.invoke(index)
+                                }
+                            )
+                            /*.padding(horizontal = 12.dp, vertical = 8.dp)*/
+                            .widthIn(min = 50.dp, max = 280.dp)
+                    ) {
+                        Column(
+                            horizontalAlignment = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Alignment.End else Alignment.Start,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 6.dp)
+                        ) {
+                            Image(
+                                painter = if (!message.message.isNullOrBlank()) rememberAsyncImagePainter(
+                                    model = message.message
+                                ) else painterResource(
+                                    id = R.drawable.ic_profile
+                                ), contentDescription = "",
+                                modifier = Modifier
+                                    .size(width = 250.dp, height = 350.dp)
+                                    .clip(RoundedCornerShape(14.dp)),
+                                contentScale = ContentScale.FillBounds
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = DateUtils.convertLongToTimeAMPM(message.timeStamp),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    }
+                    if (message.messageReactions.isNotEmpty()) {
+                        MessageReactions(
+                            modifier = Modifier
+                                .align(reactionAlignment)
+                                .offset(
+                                    y = 20.dp,
+                                    x = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 10.dp else (-10).dp
+                                )
+                                .background(Color.White, RoundedCornerShape(15.dp))
+                                .clip(RoundedCornerShape(10.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                            reactions = message.messageReactions,
+                            onReactionRemoved = { reactionIndex ->
+                                onReactionRemoved.invoke(reactionIndex)
+                            }
+                        )
+                    }
+                    AnimatedVisibility(
+                        visible = showReactions,
+                        enter = fadeIn() + expandIn(),
+                        exit = fadeOut() + shrinkOut()
+                    ) {
+                        ReactionPicker(
+                            modifier = Modifier.align(reactionAlignment)
+                                .offset(
+                                    y = 10.dp,
+                                    x = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 10.dp else (-10).dp
+                                ),
+                        ) { selectedReaction ->
+                            onReactionSelected.invoke(selectedReaction)
+                            onLongClick.invoke(-1)
+                        }
+                    }
+                }
+
+
+                /*Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Arrangement.End else Arrangement.Start
                 ) {
@@ -226,7 +313,7 @@ fun MessageItem(
                             )
                         }
                     }
-                }
+                }*/
             }
         }
     }
