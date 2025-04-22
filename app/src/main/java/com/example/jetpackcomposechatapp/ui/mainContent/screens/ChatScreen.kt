@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,6 +48,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -76,6 +78,7 @@ import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.MessageType
 import com.example.jetpackcomposechatapp.ui.mainContent.screens.chat.MessageItem
+import com.example.jetpackcomposechatapp.ui.mainContent.screens.chat.ReactionPicker
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatEvents
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatViewModel
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
@@ -92,9 +95,7 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChatScreen(
-    homeNavController: NavController,
-    userData: UserData,
-    viewModel: ChatViewModel = hiltViewModel()
+    homeNavController: NavController, userData: UserData, viewModel: ChatViewModel = hiltViewModel()
 ) {
     val chatMessages by viewModel.chatMessages.collectAsState()
     val receiverUser by viewModel.receiverUser.collectAsState()
@@ -134,7 +135,7 @@ fun ChatScreen(
 
     //Used to show reaction picker now
     var currentSelectedMessageIndex: Int by remember {
-        mutableStateOf(-1)
+        mutableIntStateOf(-1)
     }
 
     LaunchedEffect(key1 = Unit) {
@@ -155,8 +156,7 @@ fun ChatScreen(
         ChatScreenTopBar(
             onBackArrowClick = {
                 homeNavController.popBackStack()
-            },
-            userData = receiverUser
+            }, userData = receiverUser
         )
         LazyColumn(
             reverseLayout = true,
@@ -166,8 +166,7 @@ fun ChatScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .pointerInput(Unit) {
                     detectTapGestures { currentSelectedMessageIndex = -1 } // Dismiss on outside tap
-                },
-            contentPadding = PaddingValues(15.dp)
+                }, contentPadding = PaddingValues(15.dp)
         ) {
             itemsIndexed(groupMessagesByDay(chatMessages).reversed()) { index, dayMessage ->
                 when (dayMessage) {
@@ -188,8 +187,7 @@ fun ChatScreen(
                     }
 
                     is DayMessage.Item -> {
-                        MessageItem(
-                            index = index,
+                        MessageItem(index = index,
                             message = dayMessage.message,
                             receiverUser = receiverUser,
                             showReactions = index == currentSelectedMessageIndex,
@@ -211,18 +209,15 @@ fun ChatScreen(
                                         reaction = dayMessage.message.messageReactions[reactionIndex]
                                     )
                                 )
-                            }
-                        )
+                            })
                     }
                 }
             }
 
         }
-        ChatScreenBottomBar(
-            onSendButtonClick = { message ->
-                viewModel.onEvents(ChatEvents.Message(message, MessageType.MESSAGE))
-            }
-        ) {
+        ChatScreenBottomBar(homeNavController = homeNavController, onSendButtonClick = { message ->
+            viewModel.onEvents(ChatEvents.Message(message, MessageType.MESSAGE))
+        }, onSendImageClick = {
             when (PackageManager.PERMISSION_GRANTED) {
                 ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
                     val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -231,14 +226,13 @@ fun ChatScreen(
 
                 else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
-        }
+        })
     }
 }
 
 @Composable
 fun ChatScreenTopBar(
-    onBackArrowClick: () -> Unit,
-    userData: UserData
+    onBackArrowClick: () -> Unit, userData: UserData
 ) {
     Row(
         modifier = Modifier
@@ -247,31 +241,26 @@ fun ChatScreenTopBar(
             .padding(vertical = 10.dp, horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
             contentDescription = stringResource(R.string.back_arrow),
             tint = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
                 .weight(.2f)
                 .clickable {
                     onBackArrowClick()
-                }
-        )
+                })
         Image(
-            painter = if (!userData.imageUrl.isNullOrBlank()) rememberAsyncImagePainter(model = userData.imageUrl) else painterResource(
+            painter = if (!userData.imageUrl.isNullOrBlank()) rememberImagePainter(data = userData.imageUrl) else painterResource(
                 id = R.drawable.ic_profile
-            ), contentDescription = "",
-            modifier = Modifier
+            ), contentDescription = "", modifier = Modifier
                 .size(45.dp)
                 .clip(
                     CircleShape
-                ),
-            contentScale = ContentScale.FillBounds
+                ), contentScale = ContentScale.FillBounds
         )
         Spacer(modifier = Modifier.width(10.dp))
         BodyLargeComponent(
-            textValue = userData.name!!,
-            color = MaterialTheme.colorScheme.onBackground
+            textValue = userData.name!!, color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.weight(1f))
     }
@@ -280,6 +269,7 @@ fun ChatScreenTopBar(
 
 @Composable
 fun ChatScreenBottomBar(
+    homeNavController: NavController,
     onSendButtonClick: (String) -> Unit,
     onSendImageClick: () -> Unit
 ) {
@@ -323,22 +313,17 @@ fun ChatScreenBottomBar(
                 keyboardType = KeyboardType.Text,
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            keyboardActions = KeyboardActions(
-                onSend = {
-                    onSendButtonClick(message)
-                    message = ""
-                    keyboardController?.hide()
-                }
-            )
-        )
-
-        IconButton(
-            enabled = message.isNotBlank(),
-            onClick = {
+            keyboardActions = KeyboardActions(onSend = {
                 onSendButtonClick(message)
                 message = ""
-            }
-        ) {
+                keyboardController?.hide()
+            })
+        )
+
+        IconButton(enabled = message.isNotBlank(), onClick = {
+            onSendButtonClick(message)
+            message = ""
+        }) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_send_message),
                 contentDescription = "Send",
@@ -346,11 +331,9 @@ fun ChatScreenBottomBar(
             )
         }
 
-        IconButton(
-            onClick = {
-                onSendImageClick.invoke()
-            }
-        ) {
+        IconButton(onClick = {
+            onSendImageClick.invoke()
+        }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_camera),
                 contentDescription = "Image",
@@ -438,14 +421,11 @@ fun CaptureImageScreen(
                 modifier = Modifier.fillMaxSize()
             )
         }
-        IconButton(
-            enabled = imageBitmap != null,
-            onClick = {
-                imageBitmap?.let {
-                    onSendImageClick.invoke(it)
-                }
+        IconButton(enabled = imageBitmap != null, onClick = {
+            imageBitmap?.let {
+                onSendImageClick.invoke(it)
             }
-        ) {
+        }) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_send_message),
                 contentDescription = "Send",
@@ -453,4 +433,105 @@ fun CaptureImageScreen(
             )
         }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun CodeForStickyHeader() {
+    LazyColumn {
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+            ) {
+                LabelSmallComponent(
+                    textValue = "dayMessage.date",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(MaterialTheme.colorScheme.onPrimary)
+                        .padding(vertical = 50.dp, horizontal = 80.dp),
+                    fontFamily = interFontFamilySemiBold
+                )
+            }
+        }
+
+        stickyHeader {
+            ReactionPicker(modifier = Modifier) {
+
+            }
+        }
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+            ) {
+                LabelSmallComponent(
+                    textValue = "dayMessage.date",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(MaterialTheme.colorScheme.onPrimary)
+                        .padding(vertical = 50.dp, horizontal = 80.dp),
+                    fontFamily = interFontFamilySemiBold
+                )
+            }
+        }
+        stickyHeader {
+            ReactionPicker(modifier = Modifier) {
+
+            }
+        }
+    }
+
+    /*val groupedMessages = groupMessagesByDay(chatMessages).reversed()
+    var currentIndex = 0
+    groupedMessages.forEach { dayMessage ->
+
+        if (dayMessage is DayMessage.Header) {
+            stickyHeader {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    LabelSmallComponent(
+                        textValue = dayMessage.date,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(MaterialTheme.colorScheme.onPrimary)
+                            .padding(vertical = 5.dp, horizontal = 8.dp),
+                        fontFamily = interFontFamilySemiBold
+                    )
+                }
+            }
+        } else if (dayMessage is DayMessage.Item) {
+            item {
+                MessageItem(
+                    index = currentIndex,
+                    message = dayMessage.message,
+                    receiverUser = receiverUser,
+                    showReactions = currentIndex == currentSelectedMessageIndex,
+                    onLongClick = {
+                        currentSelectedMessageIndex = it
+                    },
+                    onReactionSelected = { selectedReaction ->
+                        viewModel.onEvents(
+                            ChatEvents.AddReaction(
+                                messageId = dayMessage.message.messageId,
+                                reaction = selectedReaction
+                            )
+                        )
+                    },
+                    onReactionRemoved = { reactionIndex ->
+                        viewModel.onEvents(
+                            ChatEvents.RemoveReaction(
+                                messageId = dayMessage.message.messageId,
+                                reaction = dayMessage.message.messageReactions[reactionIndex]
+                            )
+                        )
+                    }
+                )
+            }
+            currentIndex++
+        }
+    }*/
 }

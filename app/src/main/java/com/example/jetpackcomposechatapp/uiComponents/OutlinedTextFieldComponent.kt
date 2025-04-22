@@ -11,7 +11,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,7 +45,6 @@ import com.example.jetpackcomposechatapp.ui.theme.interFontFamily
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyMedium
 import com.example.jetpackcomposechatapp.ui.theme.veryLightBlue
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedTextFieldComponent(
     labelValue: String,
@@ -68,11 +69,9 @@ fun OutlinedTextFieldComponent(
 
         if (textValue.isEmpty()) {
             Text(
-                text = labelValue,
-                style = TextStyle(
+                text = labelValue, style = TextStyle(
                     fontFamily = interFontFamily
-                ),
-                modifier = Modifier
+                ), modifier = Modifier
                     .padding(start = 16.dp)
                     .align(Alignment.CenterStart)
             )
@@ -81,29 +80,22 @@ fun OutlinedTextFieldComponent(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(
-                    width = 2.dp,
-                    brush = if (isError) Brush.linearGradient(
+                    width = 2.dp, brush = if (isError) Brush.linearGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.error,
-                            MaterialTheme.colorScheme.error
+                            MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.error
                         )
                     ) else Brush.linearGradient(
                         colors = listOf(
-                            veryLightBlue,
-                            MaterialTheme.colorScheme.secondary
+                            veryLightBlue, MaterialTheme.colorScheme.secondary
                         )
-                    ),
-                    shape = RoundedCornerShape(5.dp)
-                ),
-            /*label = {
+                    ), shape = RoundedCornerShape(5.dp)
+                ),/*label = {
                 Text(text = labelValue, fontFamily = fontFamily)
             },*/
-            value = textValue,
-            onValueChange = {
+            value = textValue, onValueChange = {
                 textValue = it
                 onTextSelected(it)
-            },
-            colors = OutlinedTextFieldDefaults.colors(
+            }, colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
                 focusedTextColor = MaterialTheme.colorScheme.secondary,
@@ -115,15 +107,10 @@ fun OutlinedTextFieldComponent(
                 errorBorderColor = MaterialTheme.colorScheme.error,
                 errorLabelColor = MaterialTheme.colorScheme.error,
                 errorTextColor = MaterialTheme.colorScheme.error
-            ),
-            keyboardOptions = keyboardOptions,
-            singleLine = true,
-            /*leadingIcon = {
+            ), keyboardOptions = keyboardOptions, singleLine = true,/*leadingIcon = {
                 Icon(imageVector = leadingIcon, contentDescription = null)
             },*/
-            isError = isError,
-            shape = RoundedCornerShape(5.dp),
-            textStyle = TextStyle(
+            isError = isError, shape = RoundedCornerShape(5.dp), textStyle = TextStyle(
                 fontFamily = fontFamily
             )
         )
@@ -162,11 +149,9 @@ fun PasswordTextFieldComponent(
     Box(modifier = Modifier.fillMaxWidth()) {
         if (textValue.isEmpty()) {
             Text(
-                text = labelValue,
-                style = TextStyle(
+                text = labelValue, style = TextStyle(
                     fontFamily = interFontFamily
-                ),
-                modifier = Modifier
+                ), modifier = Modifier
                     .padding(start = 51.dp)
                     .align(Alignment.CenterStart)
             )
@@ -175,19 +160,15 @@ fun PasswordTextFieldComponent(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(
-                    width = 2.dp,
-                    brush = if (isError) Brush.linearGradient(
+                    width = 2.dp, brush = if (isError) Brush.linearGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.error,
-                            MaterialTheme.colorScheme.error
+                            MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.error
                         )
                     ) else Brush.linearGradient(
                         colors = listOf(
-                            veryLightBlue,
-                            MaterialTheme.colorScheme.secondary
+                            veryLightBlue, MaterialTheme.colorScheme.secondary
                         )
-                    ),
-                    shape = RoundedCornerShape(5.dp)
+                    ), shape = RoundedCornerShape(5.dp)
                 ),
             value = textValue,
             onValueChange = {
@@ -208,19 +189,15 @@ fun PasswordTextFieldComponent(
                 errorTextColor = MaterialTheme.colorScheme.error
             ),
             keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Default,
-                keyboardType = KeyboardType.Password
+                imeAction = ImeAction.Default, keyboardType = KeyboardType.Password
             ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    onDone.invoke()
-                }
-            ),
+            keyboardActions = KeyboardActions(onDone = {
+                onDone.invoke()
+            }),
             singleLine = true,
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = null
+                    imageVector = Icons.Default.Lock, contentDescription = null
                 )
             },
             trailingIcon = {
@@ -251,4 +228,65 @@ fun PasswordTextFieldComponent(
                 .fillMaxWidth(0.9f)
         )
     }
+}
+
+
+@Composable
+fun SearchFieldComponent(
+    labelValue: String,
+    leadingIcon: ImageVector,
+    onTextSelected: (String) -> Unit,
+    fontFamily: FontFamily = interFontFamilyMedium,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        imeAction = ImeAction.Done,
+        keyboardType = KeyboardType.Text,
+        capitalization = KeyboardCapitalization.None
+    ),
+    onCloseClick: () -> Unit,
+) {
+    var textValue by remember {
+        mutableStateOf("")
+    }
+
+    OutlinedTextField(
+        value = textValue,
+        onValueChange = {
+            textValue = it
+            onTextSelected(it)
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        shape = RoundedCornerShape(15.dp),
+        placeholder = {
+            Text(
+                text = labelValue, style = TextStyle(
+                    fontFamily = fontFamily,
+
+                    )
+            )
+        },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            focusedBorderColor = MaterialTheme.colorScheme.background,
+            unfocusedBorderColor = MaterialTheme.colorScheme.background
+        ),
+        maxLines = 3,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = KeyboardActions(
+            onDone = {
+
+            }
+        ),
+        leadingIcon = {
+            Icon(imageVector = leadingIcon, contentDescription = null)
+        },
+        trailingIcon = {
+            IconButton(onClick = {
+                onCloseClick.invoke()
+            }) {
+                Icon(imageVector = Icons.Default.Clear, contentDescription = null)
+            }
+        })
 }
