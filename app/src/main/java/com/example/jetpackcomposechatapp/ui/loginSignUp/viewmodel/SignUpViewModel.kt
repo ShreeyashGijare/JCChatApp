@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,8 @@ import javax.inject.Inject
 class SignUpViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
+    private val fbMessaging: FirebaseMessaging
 ) : ViewModel() {
 
     private val TAG: String = SignUpViewModel::class.java.name
@@ -193,12 +195,20 @@ class SignUpViewModel @Inject constructor(
             inProgress.value = true
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    createOrUpdateProfile(
-                        name = name,
-                        number = number,
-                        email = email,
-                        imageUrl = imageUrl
-                    )
+
+                    fbMessaging.token.addOnCompleteListener { tokenTask ->
+                        if (tokenTask.isSuccessful) {
+                            createOrUpdateProfile(
+                                name = name,
+                                number = number,
+                                email = email,
+                                imageUrl = imageUrl,
+                                token = tokenTask.result
+                            )
+                        }
+                    }.addOnFailureListener {
+                        Log.i("LoginNJNN", it.toString())
+                    }
                 } else {
                     Log.i("SIGNUP", "Error")
                     handleException(task.exception, customMessage = "Sign Up Failed")
@@ -211,7 +221,8 @@ class SignUpViewModel @Inject constructor(
         name: String? = null,
         number: String? = null,
         imageUrl: String? = null,
-        email: String? = null
+        email: String? = null,
+        token: String? = null
     ) {
         viewModelScope.launch {
             val user = auth.currentUser
@@ -221,7 +232,8 @@ class SignUpViewModel @Inject constructor(
                 name = name,
                 number = number,
                 imageUrl = imageUrl,
-                emailId = email
+                emailId = email,
+                token = token
             )
             val profileUpdates = UserProfileChangeRequest.Builder()
                 .setDisplayName(userData.name)

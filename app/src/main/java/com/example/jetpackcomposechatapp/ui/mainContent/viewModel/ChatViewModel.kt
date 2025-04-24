@@ -106,7 +106,6 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onEvents(event: ChatEvents) {
-
         when (event) {
             is ChatEvents.Message -> {
                 sendMessage(message = event.message, messageType = event.messageType)
@@ -189,7 +188,7 @@ class ChatViewModel @Inject constructor(
             .document(_receiverUser.value.userId!!)
 
         receiverUserObjectRef.get().addOnSuccessListener {
-            if (!it.exists()) {
+            /*if (!it.exists()) {
                 receiverUserObjectRef.set(receiverUserListObject)
             } else {
                 Log.i("ChatMessage-receiver", " -->  Exists")
@@ -200,7 +199,14 @@ class ChatViewModel @Inject constructor(
                         lastMessageType = messageType
                     )
                 )
-            }
+            }*/
+            receiverUserObjectRef.set(
+                receiverUserListObject.copy(
+                    timeStamp = Calendar.getInstance().timeInMillis,
+                    lastMessage = message,
+                    lastMessageType = messageType
+                )
+            )
         }
 
         val senderUserObjectRef =
@@ -208,7 +214,7 @@ class ChatViewModel @Inject constructor(
                 .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
 
         senderUserObjectRef.get().addOnSuccessListener {
-            if (!it.exists()) {
+            /*if (!it.exists()) {
                 senderUserObjectRef.set(currentUserListObject)
             } else {
                 Log.i("ChatMessage-sender", " -->  Exists")
@@ -219,7 +225,14 @@ class ChatViewModel @Inject constructor(
                         lastMessageType = messageType
                     )
                 )
-            }
+            }*/
+            senderUserObjectRef.set(
+                currentUserListObject.copy(
+                    timeStamp = Calendar.getInstance().timeInMillis,
+                    lastMessage = message,
+                    lastMessageType = messageType
+                )
+            )
         }
 
         //Add Message to chatRoom
@@ -281,6 +294,15 @@ class ChatViewModel @Inject constructor(
     private fun generateChatId(senderId: String, receiverId: String): String {
         return if (senderId < receiverId) "$senderId-$receiverId" else "$receiverId-$senderId"
     }
+
+
+
+    private fun sendNotification() {
+
+
+
+    }
+
 }
 
 sealed class ChatEvents {

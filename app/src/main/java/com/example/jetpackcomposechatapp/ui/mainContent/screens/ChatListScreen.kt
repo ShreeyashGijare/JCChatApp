@@ -85,6 +85,7 @@ import com.example.jetpackcomposechatapp.utils.Graph
 import com.example.jetpackcomposechatapp.utils.HomeRouteScreen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -9,7 +9,8 @@ data class UserData(
     val name: String? = "",
     val number: String? = "",
     val userId: String? = "",
-    val emailId: String? = ""
+    val emailId: String? = "",
+    val token: String? = ""
 ) : Parcelable {
 
     fun toMap() = mapOf(
@@ -17,6 +18,7 @@ data class UserData(
         "name" to name,
         "number" to number,
         "userId" to userId,
-        "emailId" to emailId
+        "emailId" to emailId,
+        "token" to token
     )
 }
