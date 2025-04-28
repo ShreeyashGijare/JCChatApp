@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jetpackcomposechatapp.BuildConfig
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.MessageType
@@ -14,6 +15,7 @@ import com.example.jetpackcomposechatapp.utils.Constants.CHAT_LIST_NODE
 import com.example.jetpackcomposechatapp.utils.Constants.CHAT_LIST_USER_NODE
 import com.example.jetpackcomposechatapp.utils.Constants.CHAT_MESSAGES
 import com.example.jetpackcomposechatapp.utils.Constants.MESSAGES
+import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,6 +27,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.IOException
 import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
@@ -33,7 +44,8 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
+    private val googleCredentials: GoogleCredentials
 ) : ViewModel() {
 
 
@@ -188,18 +200,6 @@ class ChatViewModel @Inject constructor(
             .document(_receiverUser.value.userId!!)
 
         receiverUserObjectRef.get().addOnSuccessListener {
-            /*if (!it.exists()) {
-                receiverUserObjectRef.set(receiverUserListObject)
-            } else {
-                Log.i("ChatMessage-receiver", " -->  Exists")
-                receiverUserObjectRef.set(
-                    receiverUserListObject.copy(
-                        timeStamp = Calendar.getInstance().timeInMillis,
-                        lastMessage = message,
-                        lastMessageType = messageType
-                    )
-                )
-            }*/
             receiverUserObjectRef.set(
                 receiverUserListObject.copy(
                     timeStamp = Calendar.getInstance().timeInMillis,
@@ -214,18 +214,6 @@ class ChatViewModel @Inject constructor(
                 .collection(CHAT_LIST_USER_NODE).document(auth.currentUser?.uid!!)
 
         senderUserObjectRef.get().addOnSuccessListener {
-            /*if (!it.exists()) {
-                senderUserObjectRef.set(currentUserListObject)
-            } else {
-                Log.i("ChatMessage-sender", " -->  Exists")
-                senderUserObjectRef.set(
-                    currentUserListObject.copy(
-                        timeStamp = Calendar.getInstance().timeInMillis,
-                        lastMessage = message,
-                        lastMessageType = messageType
-                    )
-                )
-            }*/
             senderUserObjectRef.set(
                 currentUserListObject.copy(
                     timeStamp = Calendar.getInstance().timeInMillis,
@@ -239,7 +227,9 @@ class ChatViewModel @Inject constructor(
         db.collection(CHAT_MESSAGES)
             .document(generateChatId(auth.currentUser?.uid!!, _receiverUser.value.userId!!))
             .collection(MESSAGES)
-            .document(_chatState.value.messageId).set(_chatState.value)
+            .document(_chatState.value.messageId).set(_chatState.value).addOnSuccessListener {
+                sendNotification(message, messageType)
+            }
     }
 
     private fun addReaction(messageId: String, reaction: String) {
@@ -265,6 +255,7 @@ class ChatViewModel @Inject constructor(
                 Log.d("Chat-Reaction", e.message.toString())
             }
     }
+
     private fun removeReaction(messageId: String, reaction: String) {
         viewModelScope.launch(Dispatchers.IO) {
             db.collection(CHAT_MESSAGES)
@@ -296,13 +287,61 @@ class ChatViewModel @Inject constructor(
     }
 
 
+    private fun sendNotification(message: String, messageType: MessageType) {
+        val notificationObject = JSONObject()
+        notificationObject.put("title", currentUser?.name.toString())
+        when (messageType) {
+            MessageType.MESSAGE -> {
+                notificationObject.put("body", message)
+            }
 
-    private fun sendNotification() {
-
-
-
+            MessageType.IMAGE -> {
+                notificationObject.put("body", "\uD83D\uDCF7 Photo")
+                notificationObject.put("image", message)
+            }
+        }
+        val dataObject = JSONObject()
+        dataObject.put("userId", currentUser?.userId.toString())
+        val messageObject = JSONObject()
+        messageObject.put("token", receiverUser.value.token)
+        messageObject.put("notification", notificationObject)
+        messageObject.put("data", dataObject)
+        val mainObject = JSONObject()
+        mainObject.put("message", messageObject)
+        callApi(mainObject)
     }
 
+    private fun callApi(jsonObj: JSONObject) {
+        viewModelScope.launch(Dispatchers.IO) {
+            googleCredentials.refreshIfExpired()
+            val accessToken = googleCredentials.accessToken.tokenValue
+
+            val json = "application/json; charset=utf-8".toMediaType()
+            val client = OkHttpClient()
+            val url = "https://fcm.googleapis.com/v1/projects/${BuildConfig.FIREBASE_PROJECT_ID}/messages:send"
+            val body = jsonObj.toString().toRequestBody(json)
+            val request = Request.Builder()
+                .url(url)
+                .post(body)
+                .addHeader("Authorization", "Bearer $accessToken")
+                .addHeader("Content-Type", "application/json")
+                .build()
+
+            println("Notification: $url")
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    println("Notification: ${e.message}")
+                    e.printStackTrace()
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val responseBody = response.body?.string()
+                    println("Notification: $responseBody")
+                }
+            })
+        }
+    }
 }
 
 sealed class ChatEvents {

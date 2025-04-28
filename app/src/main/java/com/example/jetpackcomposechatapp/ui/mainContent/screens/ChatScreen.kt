@@ -104,6 +104,13 @@ fun ChatScreen(
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Uri?>(null) }
 
+    val notLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()){}
+    LaunchedEffect(key1 = true) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     // Camera intent launcher
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
