@@ -13,6 +13,11 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,10 +31,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -38,6 +45,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -104,7 +112,12 @@ fun ChatScreen(
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Uri?>(null) }
 
-    val notLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()){}
+    var isReplying by remember {
+        mutableStateOf(false)
+    }
+
+    val notLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(key1 = true) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -216,24 +229,34 @@ fun ChatScreen(
                                         reaction = dayMessage.message.messageReactions[reactionIndex]
                                     )
                                 )
+                            },
+                            onReply = {
+                                isReplying = true
+                                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                             })
                     }
                 }
             }
 
         }
-        ChatScreenBottomBar(homeNavController = homeNavController, onSendButtonClick = { message ->
-            viewModel.onEvents(ChatEvents.Message(message, MessageType.MESSAGE))
-        }, onSendImageClick = {
-            when (PackageManager.PERMISSION_GRANTED) {
-                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
-                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    cameraLauncher.launch(cameraIntent)
-                }
+        ChatScreenBottomBar(homeNavController = homeNavController,
+            isReplying = isReplying,
+            onSendButtonClick = { message ->
+                viewModel.onEvents(ChatEvents.Message(message, MessageType.MESSAGE))
+            },
+            onSendImageClick = {
+                when (PackageManager.PERMISSION_GRANTED) {
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        cameraLauncher.launch(cameraIntent)
+                    }
 
-                else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-            }
-        })
+                    else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            },
+            isReplyCancelled = {
+                isReplying = false
+            })
     }
 }
 
@@ -273,79 +296,107 @@ fun ChatScreenTopBar(
     }
 }
 
-
 @Composable
 fun ChatScreenBottomBar(
     homeNavController: NavController,
+    isReplying: Boolean,
     onSendButtonClick: (String) -> Unit,
-    onSendImageClick: () -> Unit
+    onSendImageClick: () -> Unit,
+    isReplyCancelled: (Boolean) -> Unit
 ) {
     var message by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.onPrimary)
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .animateContentSize(animationSpec = tween(300))
     ) {
-        IconButton(onClick = { /* handle attachment */ }) {
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_attach),
-                contentDescription = stringResource(R.string.attach)
-            )
+
+        AnimatedVisibility(
+            visible = isReplying,
+            enter = expandVertically(animationSpec = tween(300)),
+            exit = shrinkVertically(animationSpec = tween(300))
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                IconButton(onClick = {
+                    isReplyCancelled.invoke(false)
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Cancel,
+                        contentDescription = stringResource(R.string.attach)
+                    )
+                }
+            }
         }
 
-        OutlinedTextField(
-            value = message,
-            onValueChange = {
-                message = it
-            },
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 8.dp),
-            shape = RoundedCornerShape(20.dp),
-            placeholder = { Text(text = stringResource(R.string.type_a_message)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.background,
-                unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                focusedBorderColor = MaterialTheme.colorScheme.background,
-                unfocusedBorderColor = MaterialTheme.colorScheme.background
-            ),
-            maxLines = 3,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Send,
-                keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Sentences
-            ),
-            keyboardActions = KeyboardActions(onSend = {
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.onPrimary)
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { /* handle attachment */ }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_attach),
+                    contentDescription = stringResource(R.string.attach)
+                )
+            }
+            OutlinedTextField(
+                value = message,
+                onValueChange = { message = it },
+                modifier = Modifier
+                    .height(56.dp)
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                shape = RoundedCornerShape(20.dp),
+                placeholder = { Text(text = stringResource(R.string.type_a_message)) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    focusedBorderColor = MaterialTheme.colorScheme.background,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.background
+                ),
+                maxLines = 3,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Send,
+                    keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
+                keyboardActions = KeyboardActions(onSend = {
+                    onSendButtonClick(message)
+                    message = ""
+                    keyboardController?.hide()
+                })
+            )
+
+            IconButton(enabled = message.isNotBlank(), onClick = {
                 onSendButtonClick(message)
                 message = ""
-                keyboardController?.hide()
-            })
-        )
+            }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_send_message),
+                    contentDescription = "Send",
+                    tint = if (message.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer
+                )
+            }
 
-        IconButton(enabled = message.isNotBlank(), onClick = {
-            onSendButtonClick(message)
-            message = ""
-        }) {
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_send_message),
-                contentDescription = "Send",
-                tint = if (message.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer
-            )
-        }
-
-        IconButton(onClick = {
-            onSendImageClick.invoke()
-        }) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_camera),
-                contentDescription = "Image",
-                tint = Color.Unspecified
-            )
+            IconButton(onClick = {
+                onSendImageClick.invoke()
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_camera),
+                    contentDescription = "Image",
+                    tint = Color.Unspecified
+                )
+            }
         }
     }
 }

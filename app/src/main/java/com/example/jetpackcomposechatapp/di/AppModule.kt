@@ -37,4 +37,10 @@ class AppModule {
     @Singleton
     fun providesFirebaseMessaging(): FirebaseMessaging = FirebaseMessaging.getInstance()
 
+
+    @Provides
+    @Singleton
+    fun providesGoogleCredentials(@ApplicationContext context: Context) = GoogleCredentials.fromStream(context.assets.open("service-account.json"))
+        .createScoped(listOf("https://www.googleapis.com/auth/firebase.messaging"))
+
 }

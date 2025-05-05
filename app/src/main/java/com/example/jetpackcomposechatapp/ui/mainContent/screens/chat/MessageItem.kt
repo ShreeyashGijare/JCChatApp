@@ -10,7 +10,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,24 +26,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.overscroll
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
@@ -48,6 +56,13 @@ import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
 import com.example.jetpackcomposechatapp.utils.DateUtils
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlin.math.roundToInt
+
+enum class SwipeToReply {
+    Resting, Replying
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -58,8 +73,44 @@ fun MessageItem(
     showReactions: Boolean,
     onLongClick: (Int) -> Unit,
     onReactionSelected: (String) -> Unit,
-    onReactionRemoved: (Int) -> Unit
+    onReactionRemoved: (Int) -> Unit,
+    onReply: (ChatState) -> Unit
 ) {
+
+    val density = LocalDensity.current
+    val messageOverallScroll = rememberOverscrollEffect()
+    val messageDragState = remember {
+        AnchoredDraggableState(
+            initialValue = SwipeToReply.Resting
+        )
+    }
+    val isCurrentUser = message.senderId == Firebase.auth.currentUser?.uid
+    val swipeThreshold = 48.dp
+
+    val anchors = remember(density, isCurrentUser) {
+        val replyOffset = with(density) {
+            if (isCurrentUser) -swipeThreshold.toPx() else swipeThreshold.toPx()
+        }
+        DraggableAnchors {
+            SwipeToReply.Resting at if (isCurrentUser) 1f else 0f
+            SwipeToReply.Replying at replyOffset
+        }
+    }
+    SideEffect {
+        messageDragState.updateAnchors(anchors)
+    }
+
+    LaunchedEffect(key1 = messageDragState) {
+        snapshotFlow { messageDragState.settledValue }
+            .collectLatest {
+                if (it == SwipeToReply.Replying) {
+                    delay(300)
+                    messageDragState.animateTo(SwipeToReply.Resting)
+                    onReply.invoke(message)
+                }
+            }
+    }
+
 
     val messageArrangement =
         if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Alignment.BottomEnd else Alignment.BottomStart
@@ -77,6 +128,23 @@ fun MessageItem(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .anchoredDraggable(
+                            messageDragState,
+                            Orientation.Horizontal,
+                            overscrollEffect = messageOverallScroll,
+                            enabled = true,
+
+                            )
+                        .overscroll(messageOverallScroll)
+                        .offset {
+                            IntOffset(
+                                x = messageDragState
+                                    .requireOffset()
+                                    .roundToInt(),
+                                y = 0
+                            )
+                        }
+
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     contentAlignment = messageArrangement
                 ) {
@@ -161,7 +229,8 @@ fun MessageItem(
                         exit = fadeOut() + shrinkOut()
                     ) {
                         ReactionPicker(
-                            modifier = Modifier.align(reactionAlignment)
+                            modifier = Modifier
+                                .align(reactionAlignment)
                                 .offset(
                                     y = 10.dp,
                                     x = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 10.dp else (-10).dp
@@ -249,7 +318,8 @@ fun MessageItem(
                         exit = fadeOut() + shrinkOut()
                     ) {
                         ReactionPicker(
-                            modifier = Modifier.align(reactionAlignment)
+                            modifier = Modifier
+                                .align(reactionAlignment)
                                 .offset(
                                     y = 10.dp,
                                     x = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 10.dp else (-10).dp
@@ -260,60 +330,6 @@ fun MessageItem(
                         }
                     }
                 }
-
-
-                /*Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Arrangement.End else Arrangement.Start
-                ) {
-                    Card(
-                        colors = CardColors(
-                            containerColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onPrimary,
-                            contentColor = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onBackground,
-                            disabledContainerColor = Color.Transparent,
-                            disabledContentColor = Color.Transparent,
-                        ),
-                        modifier = Modifier
-                            .widthIn(20.dp, 300.dp)
-                            .combinedClickable(
-                                onClick = {
-
-                                },
-                                onLongClick = {
-                                    onLongClick.invoke(index)
-                                }
-                            )
-                            .padding(8.dp),
-                        shape = RoundedCornerShape(
-                            topStart = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 15.dp else 0.dp,
-                            topEnd = 15.dp,
-                            bottomEnd = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 0.dp else 15.dp,
-                            bottomStart = 15.dp
-                        )
-                    ) {
-                        Column(
-                            horizontalAlignment = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) Alignment.End else Alignment.Start,
-                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 6.dp)
-                        ) {
-                            Image(
-                                painter = if (!message.message.isNullOrBlank()) rememberAsyncImagePainter(
-                                    model = message.message
-                                ) else painterResource(
-                                    id = R.drawable.ic_profile
-                                ), contentDescription = "",
-                                modifier = Modifier
-                                    .size(width = 250.dp, height = 350.dp)
-                                    .clip(RoundedCornerShape(14.dp)),
-                                contentScale = ContentScale.FillBounds
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = DateUtils.convertLongToTimeAMPM(message.timeStamp),
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    }
-                }*/
             }
         }
     }

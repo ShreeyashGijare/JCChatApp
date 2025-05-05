@@ -12,7 +12,7 @@ plugins {
 
 android {
     namespace = "com.example.jetpackcomposechatapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.jetpackcomposechatapp"
@@ -113,5 +113,7 @@ dependencies {
 
     //Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    implementation("androidx.compose.foundation:foundation-android:1.8.0")
 
 }
