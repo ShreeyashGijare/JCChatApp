@@ -347,7 +347,7 @@ fun UserChatItem(
             Spacer(modifier = Modifier.height(5.dp))
 
             when (user.lastMessageType) {
-                MessageType.MESSAGE -> {
+                MessageType.MESSAGE, MessageType.REPLY -> {
                     LabelMediumComponentSingleLine(
                         textValue = user.lastMessage,
                         color = MaterialTheme.colorScheme.onBackground,

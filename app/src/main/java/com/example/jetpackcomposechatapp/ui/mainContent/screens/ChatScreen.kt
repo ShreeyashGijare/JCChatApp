@@ -31,14 +31,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -75,6 +75,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -89,8 +91,10 @@ import com.example.jetpackcomposechatapp.ui.mainContent.screens.chat.MessageItem
 import com.example.jetpackcomposechatapp.ui.mainContent.screens.chat.ReactionPicker
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatEvents
 import com.example.jetpackcomposechatapp.ui.mainContent.viewModel.ChatViewModel
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyMedium
 import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
 import com.example.jetpackcomposechatapp.uiComponents.BodyLargeComponent
+import com.example.jetpackcomposechatapp.uiComponents.LabelMediumComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
 import com.example.jetpackcomposechatapp.utils.CameraUtils.getUriFromBitmap
 import com.example.jetpackcomposechatapp.utils.DateUtils.DATE_FORMAT
@@ -115,6 +119,11 @@ fun ChatScreen(
     var isReplying by remember {
         mutableStateOf(false)
     }
+
+    var selectedMessageToReply by remember {
+        mutableStateOf<ChatState?>(null)
+    }
+    val messageListState = rememberLazyListState()
 
     val notLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) {}
@@ -158,12 +167,25 @@ fun ChatScreen(
         mutableIntStateOf(-1)
     }
 
+    var replyMessageIdScroll by remember {
+        mutableStateOf("")
+    }
+
     LaunchedEffect(key1 = Unit) {
         viewModel.setReceiverUser(userData)
     }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getUserChats()
+    }
+
+    LaunchedEffect(key1 = replyMessageIdScroll) {
+        if (replyMessageIdScroll.isNotEmpty()) {
+            val index = chatMessages.indexOfLast { it.messageId == replyMessageIdScroll }
+            if (index != -1) {
+                messageListState.animateScrollToItem(index)
+            }
+        }
     }
 
     Column(
@@ -179,6 +201,7 @@ fun ChatScreen(
             }, userData = receiverUser
         )
         LazyColumn(
+            state = messageListState,
             reverseLayout = true,
             modifier = Modifier
                 .fillMaxSize()
@@ -232,7 +255,10 @@ fun ChatScreen(
                             },
                             onReply = {
                                 isReplying = true
-                                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                                selectedMessageToReply = it
+                            },
+                            onReplyMessageClick = {
+                                replyMessageIdScroll = it
                             })
                     }
                 }
@@ -241,8 +267,22 @@ fun ChatScreen(
         }
         ChatScreenBottomBar(homeNavController = homeNavController,
             isReplying = isReplying,
+            selectedMessageToReply = selectedMessageToReply,
             onSendButtonClick = { message ->
-                viewModel.onEvents(ChatEvents.Message(message, MessageType.MESSAGE))
+                if (isReplying) {
+                    viewModel.onEvents(
+                        ChatEvents.SendReply(
+                            message,
+                            selectedMessageToReply?.messageId!!,
+                            selectedMessageToReply?.message!!,
+                            MessageType.REPLY
+                        )
+                    )
+                    Toast.makeText(context, "Reply", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Normal message", Toast.LENGTH_SHORT).show()
+                    viewModel.onEvents(ChatEvents.Message(message, MessageType.MESSAGE))
+                }
             },
             onSendImageClick = {
                 when (PackageManager.PERMISSION_GRANTED) {
@@ -256,6 +296,7 @@ fun ChatScreen(
             },
             isReplyCancelled = {
                 isReplying = false
+                selectedMessageToReply = null
             })
     }
 }
@@ -300,6 +341,7 @@ fun ChatScreenTopBar(
 fun ChatScreenBottomBar(
     homeNavController: NavController,
     isReplying: Boolean,
+    selectedMessageToReply: ChatState?,
     onSendButtonClick: (String) -> Unit,
     onSendImageClick: () -> Unit,
     isReplyCancelled: (Boolean) -> Unit
@@ -317,17 +359,35 @@ fun ChatScreenBottomBar(
         AnimatedVisibility(
             visible = isReplying,
             enter = expandVertically(animationSpec = tween(300)),
-            exit = shrinkVertically(animationSpec = tween(300))
+            exit = shrinkVertically(animationSpec = tween(50))
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(start = 10.dp, top = 2.dp, end = 10.dp)
+                    .heightIn(56.dp, 100.dp)
             ) {
-                IconButton(onClick = {
-                    isReplyCancelled.invoke(false)
-                }) {
+                LabelMediumComponent(
+                    fontFamily = interFontFamilyMedium,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(.9f)
+                        .background(
+                            color = MaterialTheme.colorScheme.background,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(10.dp),
+                    textAlign = TextAlign.Start,
+                    textValue = selectedMessageToReply?.message.toString(),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    overflow = TextOverflow.Ellipsis
+                )
+                IconButton(
+                    modifier = Modifier.weight(.1f),
+                    onClick = {
+                        isReplyCancelled.invoke(false)
+                    }) {
                     Icon(
                         imageVector = Icons.Default.Cancel,
                         contentDescription = stringResource(R.string.attach)
@@ -345,15 +405,16 @@ fun ChatScreenBottomBar(
         ) {
             IconButton(onClick = { /* handle attachment */ }) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_attach),
-                    contentDescription = stringResource(R.string.attach)
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_more_options),
+                    contentDescription = stringResource(R.string.attach),
+                    tint = Color.Unspecified
                 )
             }
             OutlinedTextField(
                 value = message,
                 onValueChange = { message = it },
                 modifier = Modifier
-                    .height(56.dp)
+                    /*.height(56.dp)*/
                     .weight(1f)
                     .padding(horizontal = 8.dp),
                 shape = RoundedCornerShape(20.dp),

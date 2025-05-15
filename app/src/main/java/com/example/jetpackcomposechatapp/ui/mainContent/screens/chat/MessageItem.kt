@@ -40,6 +40,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -74,7 +75,8 @@ fun MessageItem(
     onLongClick: (Int) -> Unit,
     onReactionSelected: (String) -> Unit,
     onReactionRemoved: (Int) -> Unit,
-    onReply: (ChatState) -> Unit
+    onReply: (ChatState) -> Unit,
+    onReplyMessageClick: (String) -> Unit
 ) {
 
     val density = LocalDensity.current
@@ -244,14 +246,12 @@ fun MessageItem(
             }
 
             MessageType.IMAGE -> {
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     contentAlignment = messageArrangement
                 ) {
-
                     Box(
                         modifier = Modifier
                             .background(
@@ -270,7 +270,6 @@ fun MessageItem(
                                     onLongClick.invoke(index)
                                 }
                             )
-                            /*.padding(horizontal = 12.dp, vertical = 8.dp)*/
                             .widthIn(min = 50.dp, max = 280.dp)
                     ) {
                         Column(
@@ -292,6 +291,138 @@ fun MessageItem(
                             Text(
                                 text = DateUtils.convertLongToTimeAMPM(message.timeStamp),
                                 style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    }
+                    if (message.messageReactions.isNotEmpty()) {
+                        MessageReactions(
+                            modifier = Modifier
+                                .align(reactionAlignment)
+                                .offset(
+                                    y = 20.dp,
+                                    x = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 10.dp else (-10).dp
+                                )
+                                .background(Color.White, RoundedCornerShape(15.dp))
+                                .clip(RoundedCornerShape(10.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                            reactions = message.messageReactions,
+                            onReactionRemoved = { reactionIndex ->
+                                onReactionRemoved.invoke(reactionIndex)
+                            }
+                        )
+                    }
+                    AnimatedVisibility(
+                        visible = showReactions,
+                        enter = fadeIn() + expandIn(),
+                        exit = fadeOut() + shrinkOut()
+                    ) {
+                        ReactionPicker(
+                            modifier = Modifier
+                                .align(reactionAlignment)
+                                .offset(
+                                    y = 10.dp,
+                                    x = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 10.dp else (-10).dp
+                                ),
+                        ) { selectedReaction ->
+                            onReactionSelected.invoke(selectedReaction)
+                            onLongClick.invoke(-1)
+                        }
+                    }
+                }
+            }
+
+            MessageType.REPLY -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .anchoredDraggable(
+                            messageDragState,
+                            Orientation.Horizontal,
+                            overscrollEffect = messageOverallScroll,
+                            enabled = true,
+
+                            )
+                        .overscroll(messageOverallScroll)
+                        .offset {
+                            IntOffset(
+                                x = messageDragState
+                                    .requireOffset()
+                                    .roundToInt(),
+                                y = 0
+                            )
+                        }
+
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    contentAlignment = messageArrangement
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                messageColor, shape = RoundedCornerShape(
+                                    topStart = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 10.dp else 0.dp,
+                                    topEnd = 10.dp,
+                                    bottomEnd = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) 0.dp else 10.dp,
+                                    bottomStart = 10.dp
+                                )
+                            )
+                            .combinedClickable(
+                                onClick = {
+
+                                },
+                                onLongClick = {
+                                    onLongClick.invoke(index)
+                                }
+                            )
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                            .widthIn(min = 50.dp, max = 280.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .widthIn(min = 50.dp, max = 280.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Image(
+                                    painter = if (!receiverUser.imageUrl.isNullOrBlank()) rememberAsyncImagePainter(
+                                        model = receiverUser.imageUrl
+                                    ) else painterResource(
+                                        id = R.drawable.ic_profile
+                                    ), contentDescription = "",
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .clip(
+                                            CircleShape
+                                        ),
+                                    contentScale = ContentScale.FillBounds
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                LabelSmallComponent(
+                                    textValue = receiverUser.name!!,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = DateUtils.convertLongToTimeAMPM(message.timeStamp),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Box(
+                                modifier = Modifier
+                                    .paint(painterResource(id = R.drawable.ic_reply_message_background_two))
+                                    .clip(
+                                        RoundedCornerShape(10.dp)
+                                    )
+                                    .clickable {
+                                               onReplyMessageClick.invoke(message.repliedMessageId!!)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = message.repliedMessage!!)
+                            }
+                            Text(
+                                text = message.message.toString(),
+                                style = MaterialTheme.typography.titleMedium
                             )
                         }
                     }

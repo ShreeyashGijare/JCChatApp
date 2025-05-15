@@ -1,8 +1,5 @@
 package com.example.jetpackcomposechatapp.ui.mainContent.data.chat
 
-import java.util.Random
-import java.util.UUID
-
 data class ChatState(
     val messageId: String = "",
     var message: String? = "",
@@ -10,11 +7,14 @@ data class ChatState(
     var senderId: String? = null,
     var receiverId: String? = null,
     var messageType: MessageType = MessageType.MESSAGE,
-    var messageReactions: List<String> = arrayListOf()
+    var messageReactions: List<String> = arrayListOf(),
+    var repliedMessageId: String? = null,
+    var repliedMessage: String? = null
 )
 
 
 enum class MessageType {
     MESSAGE,
-    IMAGE
+    IMAGE,
+    REPLY
 }

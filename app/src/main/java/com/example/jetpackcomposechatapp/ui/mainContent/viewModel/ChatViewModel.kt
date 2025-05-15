@@ -147,6 +147,15 @@ class ChatViewModel @Inject constructor(
                     reaction = event.reaction
                 )
             }
+
+            is ChatEvents.SendReply -> {
+                sendMessage(
+                    message = event.message,
+                    messageType = event.messageType,
+                    repliedMessageId = event.repliedMessageId,
+                    repliedMessage = event.repliedMessage
+                )
+            }
         }
     }
 
@@ -167,8 +176,12 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-
-    private fun sendMessage(message: String, messageType: MessageType) {
+    private fun sendMessage(
+        message: String,
+        messageType: MessageType,
+        repliedMessageId: String = "",
+        repliedMessage: String = ""
+    ) {
 
         val currentUserListObject = ChatUserObject(
             imageUrl = currentUser?.imageUrl,
@@ -192,7 +205,9 @@ class ChatViewModel @Inject constructor(
             timeStamp = Calendar.getInstance().timeInMillis,
             senderId = auth.currentUser?.uid!!,
             receiverId = _receiverUser.value.userId!!,
-            messageType = messageType
+            messageType = messageType,
+            repliedMessage = if (messageType == MessageType.REPLY) repliedMessage else null,
+            repliedMessageId = if (messageType == MessageType.REPLY) repliedMessageId else null,
         )
 
         val receiverUserObjectRef = db.collection(CHAT_LIST_NODE).document(auth.currentUser?.uid!!)
@@ -291,7 +306,7 @@ class ChatViewModel @Inject constructor(
         val notificationObject = JSONObject()
         notificationObject.put("title", currentUser?.name.toString())
         when (messageType) {
-            MessageType.MESSAGE -> {
+            MessageType.MESSAGE, MessageType.REPLY -> {
                 notificationObject.put("body", message)
             }
 
@@ -318,7 +333,8 @@ class ChatViewModel @Inject constructor(
 
             val json = "application/json; charset=utf-8".toMediaType()
             val client = OkHttpClient()
-            val url = "https://fcm.googleapis.com/v1/projects/${BuildConfig.FIREBASE_PROJECT_ID}/messages:send"
+            val url =
+                "https://fcm.googleapis.com/v1/projects/${BuildConfig.FIREBASE_PROJECT_ID}/messages:send"
             val body = jsonObj.toString().toRequestBody(json)
             val request = Request.Builder()
                 .url(url)
@@ -354,4 +370,11 @@ sealed class ChatEvents {
 
     data class RemoveReaction(val messageId: String, val reaction: String) :
         ChatEvents()
+
+    data class SendReply(
+        val message: String,
+        val repliedMessageId: String,
+        val repliedMessage: String,
+        val messageType: MessageType
+    ) : ChatEvents()
 }

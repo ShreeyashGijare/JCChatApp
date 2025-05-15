@@ -220,7 +220,8 @@ fun LabelMediumComponent(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontFamily: FontFamily = interFontFamily,
-    textAlign: TextAlign = TextAlign.Center
+    textAlign: TextAlign = TextAlign.Center,
+    overflow: TextOverflow = TextOverflow.Clip
 ) {
     Text(
         text = textValue,
@@ -228,7 +229,8 @@ fun LabelMediumComponent(
         modifier = modifier,
         color = color,
         textAlign = textAlign,
-        fontFamily = fontFamily
+        fontFamily = fontFamily,
+        overflow = overflow
     )
 }
 
