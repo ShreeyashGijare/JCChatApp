@@ -14,3 +14,4 @@ val veryLightBlue = Color(0xFF7CF5FF)
 val lightBlue = Color(0xFF4B70F5)
 
 val colorOnPink = Color(0xFFDF9CE2)
+val colorOnPinkTwo = Color(0xFFDE9CE3)

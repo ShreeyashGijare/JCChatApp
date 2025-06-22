@@ -181,7 +181,8 @@ fun LabelLargeComponent(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontFamily: FontFamily = interFontFamily,
-    textAlign: TextAlign = TextAlign.Center
+    textAlign: TextAlign = TextAlign.Center,
+    overflow: TextOverflow = TextOverflow.Clip
 ) {
     Text(
         text = textValue,
@@ -189,7 +190,8 @@ fun LabelLargeComponent(
         modifier = modifier,
         color = color,
         textAlign = textAlign,
-        fontFamily = fontFamily
+        fontFamily = fontFamily,
+        overflow = overflow
     )
 }
 
@@ -261,7 +263,9 @@ fun LabelSmallComponent(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onBackground,
     fontFamily: FontFamily = interFontFamily,
-    textAlign: TextAlign = TextAlign.Center
+    textAlign: TextAlign = TextAlign.Center,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip
 ) {
     Text(
         text = textValue,
@@ -269,7 +273,9 @@ fun LabelSmallComponent(
         modifier = modifier,
         color = color,
         textAlign = textAlign,
-        fontFamily = fontFamily
+        fontFamily = fontFamily,
+        maxLines = maxLines,
+        overflow = overflow
     )
 }
 

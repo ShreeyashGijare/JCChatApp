@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.shape.CircleShape
@@ -45,6 +46,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,6 +56,12 @@ import com.example.jetpackcomposechatapp.R
 import com.example.jetpackcomposechatapp.data.userData.UserData
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.ChatState
 import com.example.jetpackcomposechatapp.ui.mainContent.data.chat.MessageType
+import com.example.jetpackcomposechatapp.ui.theme.colorBlack
+import com.example.jetpackcomposechatapp.ui.theme.colorOnPink
+import com.example.jetpackcomposechatapp.ui.theme.colorWhite
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilyMedium
+import com.example.jetpackcomposechatapp.ui.theme.interFontFamilySemiBold
+import com.example.jetpackcomposechatapp.uiComponents.LabelLargeComponent
 import com.example.jetpackcomposechatapp.uiComponents.LabelSmallComponent
 import com.example.jetpackcomposechatapp.utils.DateUtils
 import com.google.firebase.auth.ktx.auth
@@ -202,9 +211,11 @@ fun MessageItem(
                                 )
                             }
                             Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                text = message.message.toString(),
-                                style = MaterialTheme.typography.titleMedium
+                            LabelLargeComponent(
+                                textValue = message.message.toString(),
+                                color = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) colorWhite else colorBlack,
+                                textAlign = TextAlign.Start,
+                                fontFamily = interFontFamilySemiBold
                             )
                         }
                     }
@@ -406,23 +417,39 @@ fun MessageItem(
                                     style = MaterialTheme.typography.labelSmall
                                 )
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             Box(
                                 modifier = Modifier
-                                    .paint(painterResource(id = R.drawable.ic_reply_message_background_two))
-                                    .clip(
-                                        RoundedCornerShape(10.dp)
-                                    )
-                                    .clickable {
-                                               onReplyMessageClick.invoke(message.repliedMessageId!!)
-                                    },
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .background(colorOnPink, RoundedCornerShape(10.dp))
+                                    .padding(vertical = 5.dp, horizontal = 5.dp)
                             ) {
-                                Text(text = message.repliedMessage!!)
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Spacer(
+                                        modifier = Modifier
+                                            .wrapContentHeight()
+                                            .width(20.dp)
+                                            .background(colorBlack, RoundedCornerShape(5.dp))
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    LabelSmallComponent(
+                                        textValue = message.message.toString(),
+                                        color = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) colorWhite else colorBlack,
+                                        textAlign = TextAlign.Start,
+                                        fontFamily = interFontFamilyMedium,
+                                        maxLines = 3,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
                             }
-                            Text(
-                                text = message.message.toString(),
-                                style = MaterialTheme.typography.titleMedium
+                            Spacer(modifier = Modifier.height(10.dp))
+                            LabelLargeComponent(
+                                textValue = message.message.toString(),
+                                color = if (message.senderId.equals(Firebase.auth.currentUser!!.uid)) colorWhite else colorBlack,
+                                textAlign = TextAlign.Start,
+                                fontFamily = interFontFamilySemiBold
                             )
                         }
                     }
